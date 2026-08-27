@@ -1,6 +1,6 @@
 {
-  "name": "TvSize",
-  "short_name": "RealTvSize",
+  "name": "RealTvSize",
+  "short_name": "TvSize",
   "icons": [
     {
       "src": "/web-app-manifest-192x192.png",

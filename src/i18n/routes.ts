@@ -14,5 +14,17 @@ export const pagePaths = {
 export type PageId = keyof typeof pagePaths;
 
 export function localizedPath(language: Language, page: PageId) {
-	return page === 'home' ? `/${language}/` : `/${language}${pagePaths[page]}`;
+	return `/${language}${pagePaths[page]}`;
+}
+
+export function withoutTrailingSlash(pathname: string) {
+	return pathname === '/' ? pathname : pathname.replace(/\/+$/, '');
+}
+
+export function canonicalUrlForRoute(routeUrl: URL, siteUrl: URL) {
+	const canonicalUrl = new URL(withoutTrailingSlash(routeUrl.pathname), siteUrl);
+	canonicalUrl.search = '';
+	canonicalUrl.hash = '';
+
+	return canonicalUrl;
 }

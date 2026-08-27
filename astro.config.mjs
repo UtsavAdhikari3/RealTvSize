@@ -5,8 +5,9 @@ import tailwindcss from '@tailwindcss/vite';
 // https://astro.build/config
 export default defineConfig({
 	site: 'https://realtvsize.com',
+	trailingSlash: 'never',
 	redirects: {
-		'/': '/en/',
+		'/': '/en',
 	},
 	vite: {
 		plugins: [tailwindcss()],
