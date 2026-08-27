@@ -1,0 +1,28 @@
+---
+import StaticContentPage from '../../components/StaticContentPage.astro';
+import { staticPages } from '../../data/static-pages';
+import { getLanguageStaticPaths, type Language } from '../../i18n/config';
+import type { Translation } from '../../i18n/types';
+import Layout from '../../layouts/Layout.astro';
+
+export const getStaticPaths = getLanguageStaticPaths;
+
+interface Props {
+	lang: Language;
+	t: Translation;
+}
+
+const { lang, t } = Astro.props;
+const content = staticPages.termsAndConditions;
+const structuredData = {
+	'@context': 'https://schema.org',
+	'@type': 'WebPage',
+	name: t.navigation.termsAndConditions,
+	description: content.description,
+	url: `https://realtvsize.com/${lang}/terms-and-conditions`,
+};
+---
+
+<Layout title={t.pageTitles.termsAndConditions} lang={lang} page="termsAndConditions" t={t} description={content.description} structuredData={structuredData}>
+	<StaticContentPage title={t.navigation.termsAndConditions} {...content} />
+</Layout>

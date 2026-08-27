@@ -1,0 +1,109 @@
+---
+import '../styles/global.css';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { defaultLanguage, languages, type Language } from '../i18n/config';
+import { localizedPath, type PageId } from '../i18n/routes';
+import type { Translation } from '../i18n/types';
+
+interface Props {
+	title: string;
+	lang: Language;
+	page: PageId;
+	t: Translation;
+	description?: string;
+	keywords?: string;
+	image?: string;
+	imageAlt?: string;
+	structuredData?: Record<string, unknown>;
+}
+
+const {
+	title,
+	lang,
+	page,
+	t,
+	description = page === 'compare'
+		? t.comparison.intro
+		: page === 'viewingDistance'
+			? t.viewingDistance.intro
+			: page === 'findMyTvSize'
+				? t.recommender.intro
+				: `${t.comparison.intro} ${t.recommender.intro}`,
+	keywords,
+	image = '/og-tv-size-calculator.png',
+	imageAlt = 'RealTVSize TV size calculator showing two television screen sizes',
+	structuredData,
+} = Astro.props;
+
+const siteUrl = Astro.site ?? new URL('https://realtvsize.com');
+const canonicalUrl = new URL(localizedPath(lang, page), siteUrl);
+const imageUrl = new URL(image, siteUrl);
+const ogLocales: Record<Language, string> = {
+	en: 'en_US',
+	es: 'es_ES',
+	de: 'de_DE',
+	fr: 'fr_FR',
+	ja: 'ja_JP',
+};
+---
+
+<!doctype html>
+<html lang={lang}>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" href="/favicon.ico" />
+		<meta name="theme-color" content="#fafafa" media="(prefers-color-scheme: light)" />
+		<meta name="theme-color" content="#090909" media="(prefers-color-scheme: dark)" />
+		<meta name="generator" content={Astro.generator} />
+		<meta name="description" content={description} />
+		<meta name="robots" content="index, follow, max-image-preview:large" />
+		{keywords && <meta name="keywords" content={keywords} />}
+		<link rel="canonical" href={canonicalUrl} />
+		{languages.map((language) => (
+			<link rel="alternate" hreflang={language} href={new URL(localizedPath(language, page), siteUrl)} />
+		))}
+		<link rel="alternate" hreflang="x-default" href={new URL(localizedPath(defaultLanguage, page), siteUrl)} />
+
+		<meta property="og:type" content="website" />
+		<meta property="og:site_name" content="RealTVSize" />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:url" content={canonicalUrl} />
+		<meta property="og:locale" content={ogLocales[lang]} />
+		{languages.filter((language) => language !== lang).map((language) => (
+			<meta property="og:locale:alternate" content={ogLocales[language]} />
+		))}
+		<meta property="og:image" content={imageUrl} />
+		<meta property="og:image:secure_url" content={imageUrl} />
+		<meta property="og:image:type" content="image/png" />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+		<meta property="og:image:alt" content={imageAlt} />
+
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content={title} />
+		<meta name="twitter:description" content={description} />
+		<meta name="twitter:image" content={imageUrl} />
+		<meta name="twitter:image:alt" content={imageAlt} />
+		<script is:inline>
+			const savedTheme = localStorage.getItem('realtvsize-theme');
+			if (savedTheme === 'dark' || (!savedTheme && matchMedia('(prefers-color-scheme: dark)').matches)) {
+				document.documentElement.classList.add('dark');
+			}
+		</script>
+		<title>{title}</title>
+		{structuredData && <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />}
+	</head>
+	<body>
+		<a class="skip-link" href="#main-content">{t.common.skipToContent}</a>
+		<div id="top"></div>
+		<Header lang={lang} page={page} t={t} />
+		<main id="main-content">
+			<slot />
+		</main>
+		<Footer lang={lang} t={t} />
+	</body>
+</html>

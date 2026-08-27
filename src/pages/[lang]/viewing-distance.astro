@@ -1,0 +1,19 @@
+---
+import ViewingDistanceSimulator from '../../components/ViewingDistanceSimulator.astro';
+import { getLanguageStaticPaths, type Language } from '../../i18n/config';
+import type { Translation } from '../../i18n/types';
+import Layout from '../../layouts/Layout.astro';
+
+export const getStaticPaths = getLanguageStaticPaths;
+
+interface Props {
+	lang: Language;
+	t: Translation;
+}
+
+const { lang, t } = Astro.props;
+---
+
+<Layout title={t.pageTitles.viewingDistance} lang={lang} page="viewingDistance" t={t}>
+	<ViewingDistanceSimulator t={t} primaryHeading />
+</Layout>

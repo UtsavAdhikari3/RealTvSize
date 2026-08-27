@@ -1,0 +1,155 @@
+---
+import LanguageSelector from './LanguageSelector.astro';
+import type { Language } from '../i18n/config';
+import { localizedPath, type PageId } from '../i18n/routes';
+import type { Translation } from '../i18n/types';
+
+interface Props {
+	lang: Language;
+	page: PageId;
+	t: Translation;
+}
+
+const { lang, page, t } = Astro.props;
+const primaryLinks = [
+	{ page: 'compare' as const, label: t.navigation.compare },
+	{ page: 'viewingDistance' as const, label: t.navigation.viewingDistance },
+	{ page: 'findMyTvSize' as const, label: t.navigation.findMyTvSize },
+];
+const secondaryLinks = [
+	{ page: 'about' as const, label: t.navigation.about },
+	{ page: 'contact' as const, label: t.navigation.contact },
+	{ page: 'privacyPolicy' as const, label: t.navigation.privacyPolicy },
+	{ page: 'termsAndConditions' as const, label: t.navigation.termsAndConditions },
+];
+const isSecondaryPage = secondaryLinks.some((link) => link.page === page);
+---
+
+<header class="sticky top-0 z-50 border-b border-[var(--line)] bg-[color:var(--page-bg)]/90 backdrop-blur-xl">
+	<div class="site-shell grid h-14 grid-cols-[1fr_auto] items-center gap-3 lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
+		<a href={localizedPath(lang, 'home')} class="flex min-w-0 shrink-0 items-center gap-2 text-sm font-semibold tracking-[-0.02em] text-[var(--text)]" aria-label={t.navigation.homeAria}>
+			<span class="grid size-7 shrink-0 place-items-center rounded-md bg-[var(--text)] text-[var(--page-bg)]" aria-hidden="true">
+				<svg viewBox="0 0 24 24" class="size-4" fill="none" stroke="currentColor" stroke-width="1.8">
+					<rect x="3" y="5" width="18" height="12" rx="1.5"></rect>
+					<path d="M9 21h6M12 17v4"></path>
+				</svg>
+			</span>
+			<span class="truncate" translate="no">RealTVSize</span>
+		</a>
+
+		<nav aria-label={t.navigation.primaryLabel} class="hidden items-center gap-0.5 whitespace-nowrap lg:flex">
+			{primaryLinks.map((link) => (
+				<a
+					class="rounded-md px-2.5 py-1.5 text-[13px] font-medium text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface)] hover:text-[var(--text)] aria-[current=page]:bg-[var(--surface)] aria-[current=page]:text-[var(--text)]"
+					href={localizedPath(lang, link.page)}
+					aria-current={page === link.page ? 'page' : undefined}
+				>
+					{link.label}
+				</a>
+			))}
+
+			<details data-nav-details class="group relative" data-active={isSecondaryPage ? 'true' : 'false'}>
+				<summary class="flex cursor-pointer list-none items-center gap-1 rounded-md px-2.5 py-1.5 text-[13px] font-medium text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface)] hover:text-[var(--text)] group-open:bg-[var(--surface)] group-open:text-[var(--text)] group-data-[active=true]:bg-[var(--surface)] group-data-[active=true]:text-[var(--text)] [&::-webkit-details-marker]:hidden">
+					{t.navigation.more}
+					<svg class="size-3 transition-transform duration-150 group-open:rotate-180" aria-hidden="true" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5">
+						<path d="m3 4.5 3 3 3-3"></path>
+					</svg>
+				</summary>
+				<div class="absolute left-1/2 top-[calc(100%+0.5rem)] w-56 -translate-x-1/2 rounded-xl border border-[var(--line)] bg-[var(--surface-raised)] p-1.5 shadow-float">
+					{secondaryLinks.map((link) => (
+						<a
+							class="block rounded-lg px-3 py-2 text-sm text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-soft)] hover:text-[var(--text)] aria-[current=page]:bg-[var(--surface-soft)] aria-[current=page]:font-medium aria-[current=page]:text-[var(--text)]"
+							href={localizedPath(lang, link.page)}
+							aria-current={page === link.page ? 'page' : undefined}
+						>
+							{link.label}
+						</a>
+					))}
+				</div>
+			</details>
+		</nav>
+
+		<div class="flex items-center justify-end gap-1.5 lg:justify-self-end">
+			<div class="hidden sm:block">
+				<LanguageSelector lang={lang} page={page} t={t} />
+			</div>
+			<button
+				id="theme-toggle"
+				type="button"
+				aria-label={t.theme.switchToDark}
+				data-dark-label={t.theme.switchToDark}
+				data-light-label={t.theme.switchToLight}
+				class="grid size-9 shrink-0 place-items-center rounded-lg border border-transparent text-[var(--text-secondary)] transition-colors hover:border-[var(--line)] hover:bg-[var(--surface)] hover:text-[var(--text)]"
+			>
+				<svg class="theme-sun size-4 dark:hidden" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+					<circle cx="12" cy="12" r="3.5"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path>
+				</svg>
+				<svg class="theme-moon hidden size-4 dark:block" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+					<path d="M20 15.3A8.5 8.5 0 1 1 8.7 4 6.7 6.7 0 0 0 20 15.3Z"></path>
+				</svg>
+			</button>
+
+			<details data-nav-details class="group relative lg:hidden">
+				<summary class="grid size-9 cursor-pointer list-none place-items-center rounded-lg border border-transparent text-[var(--text-secondary)] transition-colors hover:border-[var(--line)] hover:bg-[var(--surface)] hover:text-[var(--text)] group-open:border-[var(--line)] group-open:bg-[var(--surface)] group-open:text-[var(--text)] [&::-webkit-details-marker]:hidden" aria-label={t.navigation.primaryLabel}>
+					<svg class="size-4 group-open:hidden" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+						<path d="M4 7h16M4 12h16M4 17h16"></path>
+					</svg>
+					<svg class="hidden size-4 group-open:block" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+						<path d="m6 6 12 12M18 6 6 18"></path>
+					</svg>
+				</summary>
+				<div class="absolute right-0 top-[calc(100%+0.5rem)] w-[min(20rem,calc(100vw-2rem))] rounded-xl border border-[var(--line)] bg-[var(--surface-raised)] p-2 shadow-float">
+					<div class="space-y-0.5">
+						{[...primaryLinks, ...secondaryLinks].map((link) => (
+							<a
+								class="block rounded-lg px-3 py-2.5 text-sm text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-soft)] hover:text-[var(--text)] aria-[current=page]:bg-[var(--surface-soft)] aria-[current=page]:font-medium aria-[current=page]:text-[var(--text)]"
+								href={localizedPath(lang, link.page)}
+								aria-current={page === link.page ? 'page' : undefined}
+							>
+								{link.label}
+							</a>
+						))}
+					</div>
+					<div class="mt-2 border-t border-[var(--line)] pt-2 sm:hidden">
+						<LanguageSelector lang={lang} page={page} t={t} />
+					</div>
+				</div>
+			</details>
+		</div>
+	</div>
+</header>
+
+<script>
+	const toggle = document.querySelector<HTMLButtonElement>('#theme-toggle');
+	const navMenus = Array.from(document.querySelectorAll<HTMLDetailsElement>('[data-nav-details]'));
+
+	function syncThemeLabel() {
+		const isDark = document.documentElement.classList.contains('dark');
+		toggle?.setAttribute('aria-label', isDark ? toggle.dataset.lightLabel! : toggle.dataset.darkLabel!);
+	}
+
+	toggle?.addEventListener('click', () => {
+		document.documentElement.classList.toggle('dark');
+		const isDark = document.documentElement.classList.contains('dark');
+		localStorage.setItem('realtvsize-theme', isDark ? 'dark' : 'light');
+		syncThemeLabel();
+	});
+
+	navMenus.forEach((menu) => {
+		menu.addEventListener('toggle', () => {
+			if (menu.open) navMenus.filter((other) => other !== menu).forEach((other) => other.removeAttribute('open'));
+		});
+	});
+
+	document.addEventListener('click', (event) => {
+		navMenus.forEach((menu) => {
+			if (!menu.contains(event.target as Node)) menu.removeAttribute('open');
+		});
+	});
+
+	document.addEventListener('keydown', (event) => {
+		if (event.key === 'Escape') navMenus.forEach((menu) => menu.removeAttribute('open'));
+	});
+
+	syncThemeLabel();
+</script>

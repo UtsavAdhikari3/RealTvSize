@@ -1,0 +1,172 @@
+---
+import RangeControl from './RangeControl.astro';
+import ResultCard from './ResultCard.astro';
+import RoomScene from './RoomScene.astro';
+import ViewerPOV from './ViewerPOV.astro';
+import type { Translation } from '../i18n/types';
+
+interface Props {
+	t: Translation;
+	primaryHeading?: boolean;
+}
+
+const { t, primaryHeading = false } = Astro.props;
+const Heading = primaryHeading ? 'h1' : 'h2';
+const clientTranslations = {
+	common: t.common,
+	profiles: t.profiles,
+	simulation: t.simulation,
+	viewingDistance: {
+		feel: t.viewingDistance.feel,
+		liveResult: t.viewingDistance.liveResult,
+	},
+};
+---
+
+<section id="distance" class="section-anchor border-y border-[var(--line)] bg-[var(--surface)] py-28 sm:py-36" data-distance-simulator data-i18n={JSON.stringify(clientTranslations)}>
+	<div class="site-shell">
+		<div class="max-w-3xl">
+			<p class="eyebrow">{t.viewingDistance.eyebrow}</p>
+			<Heading class="mt-4 text-balance text-[clamp(2.3rem,5vw,4.4rem)] font-semibold leading-[1.02] tracking-[-0.055em] text-[var(--text)]">
+				{t.viewingDistance.heading}
+			</Heading>
+			<p class="mt-5 max-w-2xl text-pretty text-base leading-7 text-[var(--text-secondary)] sm:text-lg">
+				{t.viewingDistance.intro}
+			</p>
+		</div>
+
+		<div class="mt-12 grid items-start gap-5 lg:grid-cols-[minmax(0,1.65fr)_minmax(320px,0.75fr)] lg:gap-6">
+			<div class="min-w-0 space-y-4">
+				<RoomScene id="distance-room" tvSize={75} distance={9.4} t={t} />
+				<ViewerPOV id="distance-pov" tvSize={75} distance={9.4} t={t} />
+			</div>
+
+			<div class="panel p-5 sm:p-6">
+				<div class="flex items-center justify-between gap-3 border-b border-[var(--line)] pb-5">
+					<div>
+						<p class="text-sm font-medium text-[var(--text)]">{t.viewingDistance.yourSetup}</p>
+						<p id="distance-feel" class="mt-1 text-xs text-[var(--text-tertiary)]">{t.viewingDistance.initialFeel}</p>
+					</div>
+					<span class="rounded-full border border-[var(--line)] bg-[var(--surface-soft)] px-2.5 py-1 font-mono text-[10px] text-[var(--text-tertiary)]">16:9</span>
+				</div>
+
+				<div class="space-y-7 py-6">
+					<RangeControl id="distance-tv-size" outputId="distance-tv-output" label={t.viewingDistance.tvSize} min={32} max={115} value={75} suffix={t.common.inchSymbol} />
+					<RangeControl id="viewer-distance" outputId="viewer-distance-output" label={t.viewingDistance.couchDistance} min={3} max={18} step={0.1} value={9.4} suffix={` ${t.common.feetShort}`} />
+				</div>
+
+				<div class="border-t border-[var(--line)] pt-5">
+					<p class="mb-3 text-xs font-medium text-[var(--text-tertiary)]">{t.viewingDistance.jumpToStyle}</p>
+					<div class="grid grid-cols-3 gap-2" role="group" aria-label={t.viewingDistance.positionsLabel}>
+						<button type="button" data-position="immersive" aria-pressed="false" class="position-button rounded-lg border border-[var(--line)] bg-[var(--surface-soft)] p-3 text-left hover:border-[var(--line-strong)]">
+							<span class="block text-xs font-medium text-[var(--text)]">{t.profiles.immersive.label}</span>
+							<span id="immersive-distance" class="number mt-1 block font-mono text-[10px] text-[var(--text-tertiary)]">7.5 {t.common.feetShort}</span>
+						</button>
+						<button type="button" data-position="balanced" aria-pressed="true" class="position-button rounded-lg border border-[var(--line)] bg-[var(--surface-soft)] p-3 text-left hover:opacity-90">
+							<span class="block text-xs font-medium">{t.profiles.balanced.label}</span>
+							<span id="balanced-distance" class="number mt-1 block font-mono text-[10px] opacity-60">10.2 {t.common.feetShort}</span>
+						</button>
+						<button type="button" data-position="relaxed" aria-pressed="false" class="position-button rounded-lg border border-[var(--line)] bg-[var(--surface-soft)] p-3 text-left hover:border-[var(--line-strong)]">
+							<span class="block text-xs font-medium text-[var(--text)]">{t.profiles.relaxed.label}</span>
+							<span id="relaxed-distance" class="number mt-1 block font-mono text-[10px] text-[var(--text-tertiary)]">12.3 {t.common.feetShort}</span>
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
+			<ResultCard label={t.viewingDistance.immersiveResult} value={`7.5 ${t.common.feetShort}`} id="immersive-result" note={t.viewingDistance.immersiveNote} />
+			<ResultCard label={t.viewingDistance.balancedResult} value={`10.2 ${t.common.feetShort}`} id="balanced-result" note={t.viewingDistance.balancedNote} accent />
+			<ResultCard label={t.viewingDistance.relaxedResult} value={`12.3 ${t.common.feetShort}`} id="relaxed-result" note={t.viewingDistance.relaxedNote} />
+		</div>
+		<p id="distance-live" class="sr-only" aria-live="polite"></p>
+	</div>
+</section>
+
+<script>
+	import { format, updateUrl, viewingDistance } from '../scripts/tv-math';
+	import { animateRangeInput, cancelAnimation, updateSimulationVisuals, type SimulationTranslations } from '../scripts/simulation-dom';
+	import { interpolate, type Translation } from '../i18n/types';
+
+	const root = document.querySelector<HTMLElement>('[data-distance-simulator]');
+	if (root) {
+		const t = JSON.parse(root.dataset.i18n!) as SimulationTranslations & {
+			viewingDistance: Pick<Translation['viewingDistance'], 'feel' | 'liveResult'>;
+		};
+		const tvInput = root.querySelector<HTMLInputElement>('#distance-tv-size')!;
+		const distanceInput = root.querySelector<HTMLInputElement>('#viewer-distance')!;
+		const room = root.querySelector<HTMLElement>('[data-room-scene]')!;
+		const pov = root.querySelector<HTMLElement>('[data-viewer-pov]')!;
+		const modes = ['immersive', 'balanced', 'relaxed'] as const;
+
+		const setText = (selector: string, text: string) => {
+			const element = root.querySelector<HTMLElement>(selector);
+			if (element) element.textContent = text;
+		};
+
+		function setProgress(input: HTMLInputElement) {
+			const value = Number(input.value);
+			const progress = ((value - Number(input.min)) / (Number(input.max) - Number(input.min))) * 100;
+			input.style.setProperty('--range-progress', `${progress}%`);
+		}
+
+		function styleMode(active: string) {
+			root.querySelectorAll<HTMLButtonElement>('[data-position]').forEach((button) => {
+				const isActive = button.dataset.position === active;
+				button.setAttribute('aria-pressed', String(isActive));
+				button.classList.toggle('is-active', isActive);
+				button.style.borderColor = isActive ? 'var(--text)' : '';
+				button.style.background = isActive ? 'var(--text)' : '';
+				button.style.color = isActive ? 'var(--page-bg)' : '';
+				button.querySelectorAll<HTMLElement>('span').forEach((span) => {
+					span.style.color = isActive ? 'inherit' : '';
+				});
+			});
+		}
+
+		function render(syncUrl = true) {
+			const size = Number(tvInput.value);
+			const distance = Number(distanceInput.value);
+			const recommended = Object.fromEntries(modes.map((mode) => [mode, viewingDistance(size, mode)])) as Record<(typeof modes)[number], number>;
+			const closest = modes.reduce((best, mode) => Math.abs(recommended[mode] - distance) < Math.abs(recommended[best] - distance) ? mode : best, 'balanced');
+			const { fov, profile } = updateSimulationVisuals(room, pov, size, distance, 3, t);
+
+			root.querySelector<HTMLOutputElement>('#distance-tv-output')!.textContent = `${size}${t.common.inchSymbol}`;
+			root.querySelector<HTMLOutputElement>('#viewer-distance-output')!.textContent = `${format(distance)}\u00a0${t.common.feetShort}`;
+			modes.forEach((mode) => {
+				setText(`#${mode}-distance`, `${format(recommended[mode])} ${t.common.feetShort}`);
+				setText(`#${mode}-result`, `${format(recommended[mode])} ${t.common.feetShort}`);
+			});
+			setText('#distance-feel', interpolate(t.viewingDistance.feel, { profile: profile.label, fov: format(fov, 0) }));
+			setText('#distance-live', interpolate(t.viewingDistance.liveResult, {
+				size,
+				distance: format(distance),
+				fov: format(fov, 0),
+				message: profile.message,
+			}));
+			styleMode(closest);
+			setProgress(tvInput);
+			setProgress(distanceInput);
+			if (syncUrl) updateUrl({ screen: size, viewing: distance.toFixed(1) });
+		}
+
+		[tvInput, distanceInput].forEach((input) => input.addEventListener('input', () => render()));
+		distanceInput.addEventListener('pointerdown', () => cancelAnimation(distanceInput));
+		root.querySelectorAll<HTMLButtonElement>('[data-position]').forEach((button) => {
+			button.addEventListener('click', () => {
+				const mode = button.dataset.position as (typeof modes)[number];
+				const target = viewingDistance(Number(tvInput.value), mode);
+				animateRangeInput(distanceInput, target, (complete) => render(complete));
+			});
+		});
+		window.addEventListener('resize', () => render(false), { passive: true });
+
+		const params = new URLSearchParams(location.search);
+		const screen = Number(params.get('screen'));
+		const viewing = Number(params.get('viewing'));
+		if (screen >= 32 && screen <= 115) tvInput.value = String(screen);
+		if (viewing >= 3 && viewing <= 18) distanceInput.value = String(viewing);
+		render(false);
+	}
+</script>

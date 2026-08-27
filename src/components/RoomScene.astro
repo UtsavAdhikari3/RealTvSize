@@ -1,0 +1,386 @@
+---
+import TVVisual from './TVVisual.astro';
+import { format, horizontalFov, viewProfile } from '../scripts/tv-math';
+import { interpolate, type Translation } from '../i18n/types';
+
+interface Props {
+	id: string;
+	tvSize: number;
+	distance: number;
+	mode?: 'distance' | 'recommendation';
+	t: Translation;
+}
+
+const { id, tvSize, distance, mode = 'distance', t } = Astro.props;
+const initialScale = tvSize / 115;
+const minDistance = mode === 'distance' ? 3 : 4;
+const distanceProgress = Math.max(0, Math.min(1, (distance - minDistance) / (18 - minDistance)));
+const initialViewerY = 418 + distanceProgress * 72;
+const initialTvSpan = 480 * initialScale;
+const initialTvCenterY = 290 - (480 * 9 / 16 * initialScale) / 2;
+const initialFov = horizontalFov(tvSize, distance);
+const initialProfile = t.profiles[viewProfile(initialFov).key];
+const roomAria = interpolate(t.simulation.roomAria, {
+	size: tvSize,
+	distance: format(distance),
+	fov: format(initialFov, 0),
+});
+const tvAria = interpolate(t.simulation.tvAria, { label: t.simulation.simulatedTv, size: tvSize });
+---
+
+<div
+	id={id}
+	class="room-scene"
+	role="img"
+	aria-label={roomAria}
+	data-room-scene
+	data-mode={mode}
+>
+	<div class="room-wall" aria-hidden="true">
+		<div class="wall-grid"></div>
+		<div class="room-light"></div>
+		<div class="wall-art art-left"><span></span></div>
+		<div class="wall-art art-right"><span></span></div>
+		<div class="room-tv" data-room-tv>
+			<TVVisual ariaLabel={tvAria} scale={initialScale} compact stand={false} />
+		</div>
+		<div class="media-console">
+			<span></span><span></span><span></span>
+		</div>
+	</div>
+
+	<div class="room-floor" aria-hidden="true">
+		<div class="floor-grid"></div>
+		<div class="distance-track" data-distance-track>
+			<span class="track-cap track-cap--top"></span>
+			<span class="track-cap track-cap--bottom"></span>
+			<span class="distance-readout number" data-distance-readout>{distance.toFixed(1)} {t.common.feetShort}</span>
+		</div>
+		<div class="couch" data-couch>
+			<div class="couch-back"><span></span><span></span><span></span></div>
+			<div class="couch-seat"></div>
+			<div class="couch-arm couch-arm--left"></div>
+			<div class="couch-arm couch-arm--right"></div>
+			<div class="viewer"><span class="viewer-head"></span><span class="viewer-body"></span></div>
+		</div>
+	</div>
+
+	<svg class="fov-overlay" viewBox="0 0 1000 620" preserveAspectRatio="none" aria-hidden="true">
+		<polygon
+			points={`500,${initialViewerY} ${500 - initialTvSpan / 2},${initialTvCenterY} ${500 + initialTvSpan / 2},${initialTvCenterY}`}
+			data-fov-cone
+		></polygon>
+		<line x1="500" y1={initialViewerY} x2={500 - initialTvSpan / 2} y2={initialTvCenterY} data-fov-left></line>
+		<line x1="500" y1={initialViewerY} x2={500 + initialTvSpan / 2} y2={initialTvCenterY} data-fov-right></line>
+		<circle cx="500" cy={initialViewerY} r="3" data-fov-origin></circle>
+	</svg>
+
+	<div class="fov-readout" style={`--fov-label-y:${(initialViewerY / 620) * 100}%`} aria-hidden="true" data-fov-readout>
+		<strong class="number" data-room-fov>{interpolate(t.simulation.fieldOfView, { fov: format(initialFov, 0) })}</strong>
+		<span data-room-profile>{initialProfile.label}</span>
+	</div>
+
+	<div class="room-caption" aria-hidden="true">
+		<span><i class="caption-dot caption-dot--screen"></i>{t.simulation.screenPlane}</span>
+		<span><i class="caption-dot caption-dot--seat"></i>{t.simulation.eyePosition}</span>
+	</div>
+</div>
+
+<style>
+	.room-scene {
+		position: relative;
+		isolation: isolate;
+		min-height: clamp(390px, 52vw, 610px);
+		overflow: hidden;
+		border: 1px solid var(--line);
+		border-radius: clamp(14px, 2vw, 20px);
+		background: var(--room-wall);
+		box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.03);
+	}
+
+	.room-wall {
+		position: absolute;
+		inset: 0 0 40%;
+		background: var(--room-wall);
+	}
+
+	.wall-grid {
+		position: absolute;
+		inset: 0;
+		background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+		background-size: 32px 32px;
+		mask-image: linear-gradient(to bottom, rgb(0 0 0 / 0.65), transparent 94%);
+	}
+
+	.room-light {
+		position: absolute;
+		top: -28%;
+		left: 50%;
+		width: 72%;
+		aspect-ratio: 1.8;
+		border-radius: 50%;
+		background: radial-gradient(ellipse, rgb(112 202 255 / 0.18), transparent 68%);
+		transform: translateX(-50%);
+	}
+
+	.room-tv {
+		position: absolute;
+		bottom: 22%;
+		left: 50%;
+		width: min(48%, 500px);
+		transform: translateX(-50%);
+	}
+
+	.media-console {
+		position: absolute;
+		bottom: 7%;
+		left: 50%;
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		width: min(52%, 540px);
+		height: 10%;
+		min-height: 30px;
+		border: 1px solid rgb(0 0 0 / 0.15);
+		border-radius: 3px;
+		background: linear-gradient(160deg, #8f8170, #5e554b);
+		box-shadow: 0 12px 18px rgb(0 0 0 / 0.15);
+		transform: translateX(-50%);
+	}
+
+	.media-console span + span {
+		border-left: 1px solid rgb(0 0 0 / 0.16);
+	}
+
+	.room-floor {
+		position: absolute;
+		inset: 60% 0 0;
+		background: linear-gradient(to bottom, color-mix(in srgb, var(--room-floor) 88%, black), var(--room-floor));
+		perspective: 540px;
+	}
+
+	.floor-grid {
+		position: absolute;
+		inset: 0;
+		background-image: linear-gradient(90deg, rgb(0 0 0 / 0.055) 1px, transparent 1px), linear-gradient(rgb(0 0 0 / 0.06) 1px, transparent 1px);
+		background-size: 12.5% 100%, 100% 34%;
+		transform: perspective(300px) rotateX(52deg) scale(1.5);
+		transform-origin: top;
+	}
+
+	.distance-track {
+		position: absolute;
+		top: -11%;
+		left: 50%;
+		width: 1px;
+		height: 62%;
+		background: repeating-linear-gradient(to bottom, var(--text-secondary) 0 4px, transparent 4px 8px);
+		transform: translateX(-50%) scaleY(var(--distance-scale, 0.72));
+		transform-origin: top;
+		transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+	}
+
+	.track-cap {
+		position: absolute;
+		left: -7px;
+		width: 15px;
+		height: 1px;
+		background: var(--text-secondary);
+	}
+
+	.track-cap--top { top: 0; }
+	.track-cap--bottom { bottom: 0; }
+
+	.distance-readout {
+		position: absolute;
+		top: 50%;
+		left: 10px;
+		padding: 4px 7px;
+		border: 1px solid var(--line);
+		border-radius: 5px;
+		background: var(--surface);
+		color: var(--text-secondary);
+		font-family: var(--font-mono);
+		font-size: 10px;
+		line-height: 1;
+		white-space: nowrap;
+		transform: translateY(-50%) scaleY(calc(1 / var(--distance-scale, 0.72)));
+	}
+
+	.couch {
+		position: absolute;
+		bottom: 7%;
+		left: 50%;
+		width: min(46%, 420px);
+		height: 45%;
+		filter: drop-shadow(0 16px 14px rgb(0 0 0 / 0.2));
+		z-index: 2;
+		transform: translate(-50%, var(--couch-y, 0%)) scale(var(--couch-scale, 1));
+		transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+	}
+
+	.fov-overlay {
+		position: absolute;
+		inset: 0;
+		z-index: 1;
+		width: 100%;
+		height: 100%;
+		pointer-events: none;
+	}
+
+	.fov-overlay polygon {
+		fill: rgb(80 200 240 / 0.055);
+	}
+
+	.fov-overlay line {
+		fill: none;
+		stroke: rgb(80 200 240 / 0.48);
+		stroke-dasharray: 5 7;
+		stroke-width: 1;
+		vector-effect: non-scaling-stroke;
+	}
+
+	.fov-overlay circle {
+		fill: #50c8f0;
+		stroke: var(--room-floor);
+		stroke-width: 2;
+		vector-effect: non-scaling-stroke;
+	}
+
+	.fov-readout {
+		position: absolute;
+		top: var(--fov-label-y);
+		left: calc(50% + 18px);
+		z-index: 3;
+		display: flex;
+		align-items: center;
+		gap: 7px;
+		padding: 5px 7px;
+		border: 1px solid var(--line);
+		border-radius: 6px;
+		background: color-mix(in srgb, var(--surface) 88%, transparent);
+		box-shadow: 0 2px 8px rgb(0 0 0 / 0.06);
+		color: var(--text-tertiary);
+		font-family: var(--font-mono);
+		font-size: 9px;
+		white-space: nowrap;
+		backdrop-filter: blur(8px);
+		transform: translateY(-50%);
+	}
+
+	.fov-readout strong {
+		color: var(--text-secondary);
+		font-weight: 500;
+	}
+
+	.fov-readout span::before {
+		margin-right: 7px;
+		color: var(--line-strong);
+		content: '·';
+	}
+
+	.couch-back {
+		position: absolute;
+		inset: 19% 8% 28%;
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 2px;
+		padding: 5px;
+		border-radius: 14px 14px 6px 6px;
+		background: #585a5d;
+		box-shadow: inset 0 1px rgb(255 255 255 / 0.13), inset 0 -8px 14px rgb(0 0 0 / 0.18);
+	}
+
+	.couch-back span {
+		border-radius: 9px 9px 4px 4px;
+		background: linear-gradient(#77797c, #5d5f62);
+		box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.06);
+	}
+
+	.couch-seat {
+		position: absolute;
+		inset: 63% 6% 9%;
+		border-radius: 8px 8px 14px 14px;
+		background: linear-gradient(#6f7174, #484a4d);
+		transform: perspective(160px) rotateX(58deg);
+		transform-origin: top;
+	}
+
+	.couch-arm {
+		position: absolute;
+		top: 44%;
+		bottom: 9%;
+		width: 12%;
+		border-radius: 10px 10px 8px 8px;
+		background: linear-gradient(90deg, #4b4d50, #6d6f72);
+	}
+
+	.couch-arm--left { left: 0; }
+	.couch-arm--right { right: 0; transform: scaleX(-1); }
+
+	.viewer {
+		position: absolute;
+		z-index: 2;
+		top: -5%;
+		left: 50%;
+		width: 14%;
+		height: 68%;
+		transform: translateX(-50%);
+	}
+
+	.viewer-head {
+		position: absolute;
+		top: 0;
+		left: 50%;
+		width: 62%;
+		aspect-ratio: 1;
+		border-radius: 48% 48% 44% 44%;
+		background: #232427;
+		box-shadow: inset 5px 0 8px rgb(255 255 255 / 0.05);
+		transform: translateX(-50%);
+	}
+
+	.viewer-body {
+		position: absolute;
+		inset: 27% 5% 0;
+		border-radius: 48% 48% 12% 12%;
+		background: linear-gradient(90deg, #151619, #303237 50%, #151619);
+	}
+
+	.room-caption {
+		position: absolute;
+		z-index: 4;
+		top: 14px;
+		right: 14px;
+		display: flex;
+		gap: 12px;
+		padding: 6px 8px;
+		border: 1px solid var(--line);
+		border-radius: 6px;
+		background: color-mix(in srgb, var(--surface) 84%, transparent);
+		color: var(--text-tertiary);
+		font-family: var(--font-mono);
+		font-size: 9px;
+		backdrop-filter: blur(8px);
+	}
+
+	.room-caption span { display: flex; align-items: center; gap: 5px; }
+	.caption-dot { width: 5px; height: 5px; border-radius: 50%; }
+	.caption-dot--screen { background: #50c8f0; }
+	.caption-dot--seat { background: #ffb45e; }
+
+	@media (max-width: 640px) {
+		.room-scene { min-height: 420px; }
+		.room-tv { width: 66%; }
+		.media-console { width: 70%; }
+		.couch { width: 66%; }
+		.room-caption { display: none; }
+		.fov-readout {
+			right: 8px;
+			left: auto;
+			gap: 5px;
+			padding: 4px 6px;
+			font-size: 8px;
+		}
+		.fov-readout span::before { margin-right: 5px; }
+	}
+</style>

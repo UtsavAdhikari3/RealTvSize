@@ -1,0 +1,36 @@
+---
+import { homeFaqs } from '../data/home-faq';
+---
+
+<section class="border-t border-[var(--line)] py-20 sm:py-28" aria-labelledby="tv-size-faq-heading">
+	<div class="site-shell">
+		<div class="mx-auto grid max-w-5xl gap-10 lg:grid-cols-[0.72fr_1.28fr] lg:gap-16">
+			<div>
+				<p class="eyebrow">Helpful answers</p>
+				<h2 id="tv-size-faq-heading" class="mt-4 text-balance text-3xl font-semibold leading-tight tracking-[-0.045em] text-[var(--text)] sm:text-4xl">
+					TV Size Calculator FAQs
+				</h2>
+				<p class="mt-5 max-w-md text-pretty leading-7 text-[var(--text-secondary)]">
+					Quick answers about TV measurements, common screen sizes, room fit, and choosing the right television for your viewing distance.
+				</p>
+			</div>
+
+			<div class="divide-y divide-[var(--line)] border-y border-[var(--line)]">
+				{homeFaqs.map((item, index) => (
+					<details class="group open:bg-[var(--surface)]" open={index === 0}>
+						<summary class="flex cursor-pointer list-none items-center justify-between gap-6 py-5 text-left text-base font-medium leading-6 text-[var(--text)] select-none sm:py-6 sm:text-lg [&::-webkit-details-marker]:hidden">
+							<span>{item.question}</span>
+							<span class="relative size-5 shrink-0 text-[var(--text-tertiary)]" aria-hidden="true">
+								<span class="absolute left-1/2 top-1/2 h-px w-4 -translate-x-1/2 -translate-y-1/2 bg-current"></span>
+								<span class="absolute left-1/2 top-1/2 h-4 w-px -translate-x-1/2 -translate-y-1/2 bg-current transition-opacity group-open:opacity-0"></span>
+							</span>
+						</summary>
+						<p class="max-w-2xl pb-6 pr-10 text-pretty leading-7 text-[var(--text-secondary)]">
+							{item.answer}
+						</p>
+					</details>
+				))}
+			</div>
+		</div>
+	</div>
+</section>

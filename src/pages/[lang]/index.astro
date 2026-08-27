@@ -1,0 +1,84 @@
+---
+import FaqSection from '../../components/FaqSection.astro';
+import SeoContent from '../../components/SeoContent.astro';
+import TVComparison from '../../components/TVComparison.astro';
+import TVSizeRecommender from '../../components/TVSizeRecommender.astro';
+import ViewingDistanceSimulator from '../../components/ViewingDistanceSimulator.astro';
+import WhyVisualization from '../../components/WhyVisualization.astro';
+import { homeFaqs } from '../../data/home-faq';
+import { getLanguageStaticPaths, type Language } from '../../i18n/config';
+import type { Translation } from '../../i18n/types';
+import Layout from '../../layouts/Layout.astro';
+
+export const getStaticPaths = getLanguageStaticPaths;
+
+interface Props {
+	lang: Language;
+	t: Translation;
+}
+
+const { lang, t } = Astro.props;
+const isEnglish = lang === 'en';
+const description = isEnglish
+	? 'Free TV size calculator based on room size and viewing distance. Compare screens, preview 4K viewing angles, and find the ideal TV size for your room.'
+	: `${t.comparison.intro} ${t.recommender.intro}`;
+const keywords = isEnglish
+	? 'tv size calculator, tv size calculator based on room size, tv size calculator viewing distance, tv size calculator distance, tv size calculator for room, ideal tv size calculator, room tv size calculator, tv size calculator 4k, optimal tv size calculator, distance to tv size calculator'
+	: undefined;
+const structuredData = isEnglish
+	? {
+		'@context': 'https://schema.org',
+		'@graph': [
+			{
+				'@type': 'WebApplication',
+				'@id': 'https://realtvsize.com/en/#calculator',
+				name: 'RealTVSize TV Size Calculator',
+				url: 'https://realtvsize.com/en/',
+				description,
+				applicationCategory: 'UtilitiesApplication',
+				operatingSystem: 'Any',
+				browserRequirements: 'Requires JavaScript',
+				offers: {
+					'@type': 'Offer',
+					price: '0',
+					priceCurrency: 'USD',
+				},
+				featureList: [
+					'TV size comparison',
+					'Viewing distance simulation',
+					'Room-based TV size recommendation',
+					'16:9 screen dimension calculations',
+				],
+			},
+			{
+				'@type': 'WebSite',
+				'@id': 'https://realtvsize.com/#website',
+				url: 'https://realtvsize.com/',
+				name: 'RealTVSize',
+				inLanguage: 'en',
+			},
+			{
+				'@type': 'FAQPage',
+				'@id': 'https://realtvsize.com/en/#faq',
+				mainEntity: homeFaqs.map((item) => ({
+					'@type': 'Question',
+					name: item.question,
+					acceptedAnswer: {
+						'@type': 'Answer',
+						text: item.answer,
+					},
+				})),
+			},
+		],
+	}
+	: undefined;
+---
+
+<Layout title={t.pageTitles.home} lang={lang} page="home" t={t} description={description} keywords={keywords} structuredData={structuredData}>
+	<TVComparison t={t} />
+	<ViewingDistanceSimulator t={t} />
+	<TVSizeRecommender t={t} />
+	<WhyVisualization t={t} />
+	{isEnglish && <SeoContent />}
+	{isEnglish && <FaqSection />}
+</Layout>

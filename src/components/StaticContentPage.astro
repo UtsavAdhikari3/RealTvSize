@@ -1,0 +1,57 @@
+---
+import type { StaticPageContent } from '../data/static-pages';
+
+interface Props extends StaticPageContent {
+	title: string;
+}
+
+const { title, eyebrow, intro, updated, sections, contactEmail } = Astro.props;
+---
+
+<article class="site-shell py-16 sm:py-24">
+	<div class="mx-auto max-w-3xl">
+		<header class="border-b border-[var(--line)] pb-10 sm:pb-14">
+			<p class="eyebrow">{eyebrow}</p>
+			<h1 class="mt-4 max-w-2xl text-4xl font-semibold tracking-[-0.045em] text-balance sm:text-6xl">{title}</h1>
+			<p class="mt-6 max-w-2xl text-lg leading-8 text-[var(--text-secondary)] text-pretty">{intro}</p>
+			{updated && <p class="mt-5 font-mono text-xs text-[var(--text-tertiary)]">{updated}</p>}
+		</header>
+
+		<div class="divide-y divide-[var(--line)]">
+			{sections.map((section) => (
+				<section class="py-9 sm:py-11">
+					<h2 class="text-xl font-semibold tracking-[-0.025em] sm:text-2xl">{section.heading}</h2>
+					{section.paragraphs && (
+						<div class="mt-4 space-y-4 text-base leading-7 text-[var(--text-secondary)]">
+							{section.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+						</div>
+					)}
+					{section.items && (
+						<ul class="mt-5 space-y-3 text-base leading-7 text-[var(--text-secondary)]">
+							{section.items.map((item) => (
+								<li class="flex gap-3">
+									<span class="mt-[0.65rem] size-1.5 shrink-0 rounded-full bg-[var(--text-tertiary)]" aria-hidden="true"></span>
+									<span>{item}</span>
+								</li>
+							))}
+						</ul>
+					)}
+					{contactEmail && section.showEmail && (
+						<a class="mt-6 inline-flex rounded-full bg-[var(--text)] px-5 py-3 text-sm font-semibold text-[var(--page-bg)] transition-opacity hover:opacity-80" href={`mailto:${contactEmail}`}>
+							{contactEmail}
+						</a>
+					)}
+				</section>
+			))}
+		</div>
+
+		{contactEmail && !sections.some((section) => section.showEmail) && (
+			<aside class="panel mt-4 p-6 sm:p-8">
+				<p class="eyebrow">Questions about this page?</p>
+				<a class="mt-3 inline-block text-base font-semibold text-[var(--text)] underline decoration-[var(--line-strong)] underline-offset-4 hover:decoration-[var(--text)]" href={`mailto:${contactEmail}`}>
+					{contactEmail}
+				</a>
+			</aside>
+		)}
+	</div>
+</article>

@@ -1,0 +1,215 @@
+---
+import TVVisual from './TVVisual.astro';
+import { apparentViewScale, format, horizontalFov, viewProfile } from '../scripts/tv-math';
+import { interpolate, type Translation } from '../i18n/types';
+
+interface Props {
+	id: string;
+	tvSize: number;
+	distance: number;
+	t: Translation;
+}
+
+const { id, tvSize, distance, t } = Astro.props;
+const fov = horizontalFov(tvSize, distance);
+const apparentScale = apparentViewScale(tvSize, distance);
+const profile = t.profiles[viewProfile(fov).key];
+const povAria = interpolate(t.simulation.povAria, {
+	size: tvSize,
+	distance: format(distance),
+	fov: format(fov, 0),
+});
+const tvAria = interpolate(t.simulation.tvAria, { label: t.simulation.viewpointTv, size: tvSize });
+---
+
+<div
+	id={id}
+	class="viewer-pov"
+	role="img"
+	aria-label={povAria}
+	data-viewer-pov
+>
+	<div class="pov-heading">
+		<div>
+			<p class="pov-eyebrow">{t.simulation.yourView}</p>
+			<p class="pov-description">{t.simulation.viewDescription}</p>
+		</div>
+		<div class="pov-metrics" aria-hidden="true">
+			<span class="number" data-pov-distance>{format(distance)} {t.common.feetShort}</span>
+			<span class="metric-separator"></span>
+			<span class="number" data-pov-fov>{interpolate(t.simulation.fieldOfView, { fov: format(fov, 0) })}</span>
+			<span class="metric-separator"></span>
+			<span data-pov-profile>{profile.label}</span>
+		</div>
+	</div>
+
+	<div class="pov-window" aria-hidden="true">
+		<div class="pov-ceiling-line"></div>
+		<div class="pov-side pov-side--left"></div>
+		<div class="pov-side pov-side--right"></div>
+		<div class="pov-wall-seam"></div>
+		<div class="pov-tv" data-pov-tv>
+			<TVVisual ariaLabel={tvAria} scale={apparentScale} compact stand={false} />
+		</div>
+		<div class="pov-console"><span></span><span></span><span></span></div>
+		<div class="pov-vignette"></div>
+	</div>
+
+	<p class="pov-feedback" data-pov-message>{profile.message}</p>
+</div>
+
+<style>
+	.viewer-pov {
+		overflow: hidden;
+		border: 1px solid var(--line);
+		border-radius: clamp(14px, 2vw, 20px);
+		background: var(--surface);
+	}
+
+	.pov-heading {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 20px;
+		padding: 14px 16px;
+		border-bottom: 1px solid var(--line);
+	}
+
+	.pov-eyebrow {
+		margin: 0;
+		color: var(--text);
+		font-size: 13px;
+		font-weight: 600;
+		letter-spacing: -0.02em;
+	}
+
+	.pov-description {
+		margin: 2px 0 0;
+		color: var(--text-tertiary);
+		font-size: 10px;
+	}
+
+	.pov-metrics {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		color: var(--text-secondary);
+		font-family: var(--font-mono);
+		font-size: 10px;
+		white-space: nowrap;
+	}
+
+	.metric-separator {
+		width: 2px;
+		height: 2px;
+		border-radius: 50%;
+		background: var(--line-strong);
+	}
+
+	.pov-window {
+		position: relative;
+		display: grid;
+		place-items: center;
+		min-height: clamp(210px, 26vw, 300px);
+		overflow: hidden;
+		background:
+			linear-gradient(to bottom, color-mix(in srgb, var(--room-wall) 94%, white), var(--room-wall) 74%),
+			var(--room-wall);
+		perspective: 700px;
+	}
+
+	.pov-window::before {
+		position: absolute;
+		inset: 0;
+		background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+		background-size: 32px 32px;
+		mask-image: radial-gradient(ellipse at center, black, transparent 78%);
+		content: '';
+	}
+
+	.pov-ceiling-line,
+	.pov-wall-seam {
+		position: absolute;
+		left: 0;
+		width: 100%;
+		height: 1px;
+		background: rgb(0 0 0 / 0.07);
+	}
+
+	.pov-ceiling-line { top: 12%; }
+	.pov-wall-seam { bottom: 15%; }
+
+	.pov-side {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		width: 13%;
+		background: linear-gradient(90deg, rgb(0 0 0 / 0.13), transparent);
+	}
+
+	.pov-side--left { left: 0; }
+	.pov-side--right { right: 0; transform: scaleX(-1); }
+
+	.pov-tv {
+		position: relative;
+		z-index: 2;
+		width: 100%;
+	}
+
+	.pov-tv :global([data-tv-visual]) {
+		transform-origin: center;
+		filter: drop-shadow(0 14px 20px rgb(0 0 0 / 0.18));
+	}
+
+	.pov-console {
+		position: absolute;
+		bottom: 7%;
+		left: 50%;
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		width: 47%;
+		height: 9%;
+		min-height: 16px;
+		border-radius: 2px;
+		background: linear-gradient(160deg, #8f8170, #5e554b);
+		box-shadow: 0 8px 14px rgb(0 0 0 / 0.16);
+		transform: translateX(-50%);
+	}
+
+	.pov-console span + span { border-left: 1px solid rgb(0 0 0 / 0.16); }
+
+	.pov-vignette {
+		position: absolute;
+		inset: -1px;
+		z-index: 3;
+		pointer-events: none;
+		box-shadow: inset 0 0 70px rgb(0 0 0 / 0.16);
+	}
+
+	.pov-feedback {
+		min-height: 38px;
+		margin: 0;
+		padding: 11px 16px;
+		border-top: 1px solid var(--line);
+		color: var(--text-secondary);
+		font-size: 11px;
+		line-height: 16px;
+	}
+
+	@media (max-width: 640px) {
+		.pov-heading {
+			align-items: flex-start;
+			flex-direction: column;
+			gap: 8px;
+		}
+
+		.pov-metrics {
+			width: 100%;
+			justify-content: space-between;
+			gap: 5px;
+		}
+
+		.pov-window { min-height: 220px; }
+		.pov-console { width: 60%; }
+	}
+</style>

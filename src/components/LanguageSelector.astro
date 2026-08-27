@@ -1,0 +1,40 @@
+---
+import { languageConfig, type Language } from '../i18n/config';
+import { localizedPath, type PageId } from '../i18n/routes';
+import type { Translation } from '../i18n/types';
+
+interface Props {
+	lang: Language;
+	page: PageId;
+	t: Translation;
+}
+
+const { lang, page, t } = Astro.props;
+---
+
+<label class="relative block shrink-0">
+	<span class="sr-only">{t.navigation.language}</span>
+	<select
+		data-language-select
+		aria-label={t.navigation.language}
+		class="h-9 w-full cursor-pointer appearance-none rounded-lg border border-transparent bg-transparent py-0 pl-2.5 pr-7 text-xs font-medium text-[var(--text-secondary)] transition-colors hover:border-[var(--line)] hover:bg-[var(--surface)] hover:text-[var(--text)] sm:w-auto"
+	>
+		{Object.entries(languageConfig).map(([code, config]) => (
+			<option value={localizedPath(code as Language, page)} selected={code === lang}>{config.label}</option>
+		))}
+	</select>
+	<svg class="pointer-events-none absolute right-2.5 top-1/2 size-3 -translate-y-1/2 text-[var(--text-tertiary)]" aria-hidden="true" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5">
+		<path d="m3 4.5 3 3 3-3"></path>
+	</svg>
+</label>
+
+<script>
+	document.querySelectorAll<HTMLSelectElement>('[data-language-select]').forEach((select) => {
+		select.addEventListener('change', () => {
+			const destination = new URL(select.value, window.location.origin);
+			destination.search = window.location.search;
+			destination.hash = window.location.hash;
+			window.location.assign(destination);
+		});
+	});
+</script>

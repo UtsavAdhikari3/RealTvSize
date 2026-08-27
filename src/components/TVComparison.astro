@@ -1,0 +1,197 @@
+---
+import MeasurementLabel from './MeasurementLabel.astro';
+import RangeControl from './RangeControl.astro';
+import ResultCard from './ResultCard.astro';
+import TVVisual from './TVVisual.astro';
+import { interpolate, type Translation } from '../i18n/types';
+
+interface Props {
+	t: Translation;
+}
+
+const { t } = Astro.props;
+const clientTranslations = {
+	common: t.common,
+	comparison: {
+		liveResult: t.comparison.liveResult,
+		tvA: t.comparison.tvA,
+		tvB: t.comparison.tvB,
+	},
+	simulation: {
+		tvAria: t.simulation.tvAria,
+	},
+};
+const tvAAria = interpolate(t.simulation.tvAria, { label: t.comparison.tvA, size: 65 });
+const tvBAria = interpolate(t.simulation.tvAria, { label: t.comparison.tvB, size: 85 });
+---
+
+<section id="compare" class="section-anchor site-shell pb-28 pt-10 sm:pb-36 sm:pt-14" data-comparison data-i18n={JSON.stringify(clientTranslations)}>
+	<div class="mx-auto max-w-4xl text-center">
+		<p class="eyebrow">{t.comparison.eyebrow}</p>
+		<h1 class="mt-5 text-balance text-[clamp(2.65rem,7vw,5.5rem)] font-semibold leading-[0.98] tracking-[-0.065em] text-[var(--text)]">
+			{t.comparison.heading}
+		</h1>
+		<p class="mx-auto mt-6 max-w-2xl text-pretty text-base leading-7 text-[var(--text-secondary)] sm:text-lg">
+			{t.comparison.intro}
+		</p>
+	</div>
+
+	<div class="panel relative mt-12 overflow-hidden sm:mt-16">
+		<div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(0,112,243,0.08),transparent_36%)]" aria-hidden="true"></div>
+		<div class="relative border-b border-[var(--line)] px-4 py-4 sm:px-6">
+			<div class="flex items-center justify-between gap-4">
+				<div>
+					<p class="text-sm font-medium text-[var(--text)]">{t.comparison.studio}</p>
+					<p class="mt-0.5 text-xs text-[var(--text-tertiary)]">{t.comparison.studioDescription}</p>
+				</div>
+				<div class="hidden items-center gap-1 rounded-full border border-[var(--line)] bg-[var(--surface-soft)] p-1 sm:flex" role="group" aria-label={t.comparison.popularComparisons}>
+					<button type="button" data-pair="55,65" class="rounded-full px-3 py-1.5 font-mono text-[10px] text-[var(--text-secondary)] hover:bg-[var(--surface)] hover:text-[var(--text)]">55 {t.comparison.versus} 65</button>
+					<button type="button" data-pair="65,75" class="rounded-full px-3 py-1.5 font-mono text-[10px] text-[var(--text-secondary)] hover:bg-[var(--surface)] hover:text-[var(--text)]">65 {t.comparison.versus} 75</button>
+					<button type="button" data-pair="65,85" class="rounded-full bg-[var(--surface)] px-3 py-1.5 font-mono text-[10px] text-[var(--text)] shadow-sm hover:bg-[var(--surface-raised)]">65 {t.comparison.versus} 85</button>
+				</div>
+			</div>
+		</div>
+
+		<div class="comparison-stage relative min-h-[330px] overflow-hidden border-b border-[var(--line)] px-3 pt-12 sm:min-h-[490px] sm:px-10 sm:pt-16">
+			<div class="stage-grid absolute inset-0" aria-hidden="true"></div>
+			<div class="absolute inset-x-0 bottom-12 h-px bg-[var(--line-strong)] sm:bottom-16" aria-hidden="true"></div>
+			<div class="relative z-10 grid h-full min-h-[280px] grid-cols-2 items-end gap-3 sm:min-h-[420px] sm:gap-10">
+				<div class="flex h-full min-w-0 flex-col justify-end">
+					<div class="mb-3 text-center">
+						<span id="tv-a-size-badge" class="number inline-flex items-baseline rounded-full border border-[var(--line)] bg-[var(--surface)] px-3 py-1.5 text-xl font-medium tracking-[-0.04em] text-[var(--text)] sm:text-2xl">65<span class="ml-0.5 text-xs text-[var(--text-tertiary)]">{t.common.inchesShort}</span></span>
+					</div>
+					<div class="tv-frame">
+						<TVVisual id="tv-a-visual" ariaLabel={tvAAria} scale={65 / 85} />
+					</div>
+					<div class="mt-2 px-1 sm:px-5">
+						<MeasurementLabel label={t.comparison.width} value={`56.7 ${t.common.inchesShort}`} id="tv-a-width" />
+					</div>
+				</div>
+
+				<div class="flex h-full min-w-0 flex-col justify-end">
+					<div class="mb-3 text-center">
+						<span id="tv-b-size-badge" class="number inline-flex items-baseline rounded-full border border-[var(--line)] bg-[var(--surface)] px-3 py-1.5 text-xl font-medium tracking-[-0.04em] text-[var(--text)] sm:text-2xl">85<span class="ml-0.5 text-xs text-[var(--text-tertiary)]">{t.common.inchesShort}</span></span>
+					</div>
+					<div class="tv-frame">
+						<TVVisual id="tv-b-visual" ariaLabel={tvBAria} scale={1} />
+					</div>
+					<div class="mt-2 px-1 sm:px-5">
+						<MeasurementLabel label={t.comparison.width} value={`74.1 ${t.common.inchesShort}`} id="tv-b-width" />
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="relative grid gap-6 p-5 sm:grid-cols-2 sm:p-8">
+			<RangeControl id="tv-a-input" outputId="tv-a-output" label={t.comparison.firstTv} min={32} max={115} value={65} suffix={t.common.inchSymbol} />
+			<RangeControl id="tv-b-input" outputId="tv-b-output" label={t.comparison.secondTv} min={32} max={115} value={85} suffix={t.common.inchSymbol} />
+		</div>
+	</div>
+
+	<div class="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6" role="region" aria-label={t.comparison.resultsLabel}>
+		<ResultCard label={t.comparison.diagonalDifference} value={`20.0 ${t.common.inchesShort}`} id="diagonal-diff" />
+		<ResultCard label={t.comparison.widthDifference} value={`17.4 ${t.common.inchesShort}`} id="width-diff" />
+		<ResultCard label={t.comparison.heightDifference} value={`9.8 ${t.common.inchesShort}`} id="height-diff" />
+		<ResultCard label={t.comparison.areaIncrease} value="71.0%" id="area-increase" accent />
+		<ResultCard label={t.comparison.screenAreaDifference} value={`1,282 ${t.common.squareInchesShort}`} id="area-diff" />
+		<ResultCard label={t.comparison.heightPair} value={`31.9 / 41.7 ${t.common.inchesShort}`} id="height-pair" />
+	</div>
+	<p id="comparison-live" class="sr-only" aria-live="polite"></p>
+</section>
+
+<script>
+	import { dimensions, format, updateUrl } from '../scripts/tv-math';
+	import { interpolate, type Translation } from '../i18n/types';
+
+	const root = document.querySelector<HTMLElement>('[data-comparison]');
+	if (root) {
+		const t = JSON.parse(root.dataset.i18n!) as {
+			common: Translation['common'];
+			comparison: Pick<Translation['comparison'], 'liveResult' | 'tvA' | 'tvB'>;
+			simulation: Pick<Translation['simulation'], 'tvAria'>;
+		};
+		const inputA = root.querySelector<HTMLInputElement>('#tv-a-input')!;
+		const inputB = root.querySelector<HTMLInputElement>('#tv-b-input')!;
+		const outputA = root.querySelector<HTMLOutputElement>('#tv-a-output')!;
+		const outputB = root.querySelector<HTMLOutputElement>('#tv-b-output')!;
+		const visualA = root.querySelector<HTMLElement>('#tv-a-visual')!;
+		const visualB = root.querySelector<HTMLElement>('#tv-b-visual')!;
+
+		const setText = (selector: string, value: string) => {
+			const element = root.querySelector<HTMLElement>(selector);
+			if (element) element.textContent = value;
+		};
+
+		function setRangeProgress(input: HTMLInputElement) {
+			const progress = ((Number(input.value) - Number(input.min)) / (Number(input.max) - Number(input.min))) * 100;
+			input.style.setProperty('--range-progress', `${progress}%`);
+		}
+
+		function render(syncUrl = true) {
+			const sizeA = Number(inputA.value);
+			const sizeB = Number(inputB.value);
+			const a = dimensions(sizeA);
+			const b = dimensions(sizeB);
+			const maxSize = Math.max(sizeA, sizeB);
+			const smallArea = Math.min(a.area, b.area);
+			const largeArea = Math.max(a.area, b.area);
+
+			visualA.style.setProperty('--tv-scale', String(sizeA / maxSize));
+			visualB.style.setProperty('--tv-scale', String(sizeB / maxSize));
+			visualA.setAttribute('aria-label', interpolate(t.simulation.tvAria, { label: t.comparison.tvA, size: sizeA }));
+			visualB.setAttribute('aria-label', interpolate(t.simulation.tvAria, { label: t.comparison.tvB, size: sizeB }));
+			outputA.textContent = `${sizeA}${t.common.inchSymbol}`;
+			outputB.textContent = `${sizeB}${t.common.inchSymbol}`;
+			setText('#tv-a-size-badge', `${sizeA} ${t.common.inchesShort}`);
+			setText('#tv-b-size-badge', `${sizeB} ${t.common.inchesShort}`);
+			setText('#tv-a-width', `${format(a.width)} ${t.common.inchesShort}`);
+			setText('#tv-b-width', `${format(b.width)} ${t.common.inchesShort}`);
+			setText('#diagonal-diff', `${format(Math.abs(sizeB - sizeA))} ${t.common.inchesShort}`);
+			setText('#width-diff', `${format(Math.abs(b.width - a.width))} ${t.common.inchesShort}`);
+			setText('#height-diff', `${format(Math.abs(b.height - a.height))} ${t.common.inchesShort}`);
+			setText('#area-increase', `${format(((largeArea - smallArea) / smallArea) * 100)}%`);
+			setText('#area-diff', `${format(Math.abs(b.area - a.area), 0)} ${t.common.squareInchesShort}`);
+			setText('#height-pair', `${format(a.height)} / ${format(b.height)} ${t.common.inchesShort}`);
+			setText('#comparison-live', interpolate(t.comparison.liveResult, {
+				sizeA,
+				sizeB,
+				increase: format(((largeArea - smallArea) / smallArea) * 100),
+			}));
+			setRangeProgress(inputA);
+			setRangeProgress(inputB);
+			if (syncUrl) updateUrl({ tv1: sizeA, tv2: sizeB });
+		}
+
+		[inputA, inputB].forEach((input) => input.addEventListener('input', () => render()));
+		root.querySelectorAll<HTMLButtonElement>('[data-pair]').forEach((button) => {
+			button.addEventListener('click', () => {
+				const [a, b] = button.dataset.pair!.split(',');
+				inputA.value = a;
+				inputB.value = b;
+				render();
+			});
+		});
+
+		const params = new URLSearchParams(location.search);
+		const queryA = Number(params.get('tv1'));
+		const queryB = Number(params.get('tv2'));
+		if (queryA >= 32 && queryA <= 115) inputA.value = String(queryA);
+		if (queryB >= 32 && queryB <= 115) inputB.value = String(queryB);
+		render(false);
+	}
+</script>
+
+<style>
+	.stage-grid {
+		background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+		background-size: 24px 24px;
+		mask-image: linear-gradient(to bottom, rgb(0 0 0 / 0.35), rgb(0 0 0 / 0.8));
+	}
+
+	.tv-frame {
+		display: flex;
+		align-items: flex-end;
+		width: 100%;
+		aspect-ratio: 16 / 11;
+	}
+</style>

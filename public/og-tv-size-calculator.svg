@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title description">
+	<title id="title">RealTVSize TV Size Calculator</title>
+	<desc id="description">Compare television sizes and calculate the ideal screen for your room and viewing distance.</desc>
+	<defs>
+		<linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+			<stop offset="0" stop-color="#090909" />
+			<stop offset="1" stop-color="#171717" />
+		</linearGradient>
+		<radialGradient id="glow" cx="50%" cy="45%" r="60%">
+			<stop offset="0" stop-color="#0070f3" stop-opacity=".28" />
+			<stop offset="1" stop-color="#0070f3" stop-opacity="0" />
+		</radialGradient>
+		<pattern id="grid" width="36" height="36" patternUnits="userSpaceOnUse">
+			<path d="M36 0H0V36" fill="none" stroke="#fff" stroke-opacity=".045" />
+		</pattern>
+	</defs>
+	<rect width="1200" height="630" rx="32" fill="url(#background)" />
+	<rect width="1200" height="630" rx="32" fill="url(#glow)" />
+	<rect width="1200" height="630" rx="32" fill="url(#grid)" />
+	<g transform="translate(72 66)">
+		<rect width="42" height="42" rx="10" fill="#f5f5f5" />
+		<rect x="9" y="10" width="24" height="17" rx="2" fill="none" stroke="#111" stroke-width="2.5" />
+		<path d="M16 33h10M21 27v6" stroke="#111" stroke-width="2.5" stroke-linecap="round" />
+		<text x="56" y="30" fill="#f5f5f5" font-family="Inter, Arial, sans-serif" font-size="25" font-weight="700" letter-spacing="-1">RealTVSize</text>
+	</g>
+	<g transform="translate(72 175)" font-family="Inter, Arial, sans-serif">
+		<text fill="#60a5fa" font-size="18" font-weight="700" letter-spacing="3">FREE ONLINE TOOL</text>
+		<text y="73" fill="#fff" font-size="64" font-weight="750" letter-spacing="-3">TV Size Calculator</text>
+		<text y="122" fill="#a3a3a3" font-size="27">Find the ideal screen for your room</text>
+		<text y="160" fill="#a3a3a3" font-size="27">and viewing distance.</text>
+	</g>
+	<g transform="translate(740 142)">
+		<rect x="0" y="122" width="218" height="124" rx="8" fill="#050505" stroke="#737373" stroke-width="5" />
+		<rect x="47" y="0" width="320" height="182" rx="9" fill="#050505" stroke="#d4d4d4" stroke-width="6" />
+		<path d="M163 184v25m-53 0h106" stroke="#d4d4d4" stroke-width="6" stroke-linecap="round" />
+		<path d="M87 61h240" stroke="#0070f3" stroke-width="3" stroke-dasharray="8 9" />
+		<circle cx="87" cy="61" r="6" fill="#60a5fa" />
+		<circle cx="327" cy="61" r="6" fill="#60a5fa" />
+		<text x="203" y="49" text-anchor="middle" fill="#93c5fd" font-family="ui-monospace, monospace" font-size="18">85 in</text>
+		<text x="109" y="274" text-anchor="middle" fill="#a3a3a3" font-family="ui-monospace, monospace" font-size="17">65 in</text>
+	</g>
+	<g transform="translate(72 550)" font-family="ui-monospace, monospace" font-size="18" fill="#a3a3a3">
+		<text>ROOM SIZE</text>
+		<circle cx="137" cy="-6" r="3" fill="#525252" />
+		<text x="158">VIEWING DISTANCE</text>
+		<circle cx="376" cy="-6" r="3" fill="#525252" />
+		<text x="397">4K</text>
+	</g>
+</svg>
