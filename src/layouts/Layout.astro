@@ -54,6 +54,7 @@ const ogLocales: Record<Language, string> = {
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="sitemap" href="/sitemap.xml" />
 		<link rel="icon" href="/favicon.ico" />
 		<meta name="theme-color" content="#fafafa" media="(prefers-color-scheme: light)" />
 		<meta name="theme-color" content="#090909" media="(prefers-color-scheme: dark)" />
@@ -88,6 +89,18 @@ const ogLocales: Record<Language, string> = {
 		<meta name="twitter:description" content={description} />
 		<meta name="twitter:image" content={imageUrl} />
 		<meta name="twitter:image:alt" content={imageAlt} />
+
+		<!-- Google tag (gtag.js) -->
+		<script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-H168NPJCQM"></script>
+		<script is:inline>
+			window.dataLayer = window.dataLayer || [];
+			function gtag() {
+				dataLayer.push(arguments);
+			}
+			gtag('js', new Date());
+			gtag('config', 'G-H168NPJCQM');
+		</script>
+
 		<script is:inline>
 			const savedTheme = localStorage.getItem('realtvsize-theme');
 			if (savedTheme === 'dark' || (!savedTheme && matchMedia('(prefers-color-scheme: dark)').matches)) {

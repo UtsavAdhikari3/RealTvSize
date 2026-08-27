@@ -1,0 +1,20 @@
+---
+import ErrorPage from '../components/ErrorPage.astro';
+
+interface Props {
+	error: unknown;
+}
+
+const { error: _error } = Astro.props;
+---
+
+<ErrorPage
+	status={500}
+	eyebrow="Temporary interruption"
+	title="The picture cut out."
+	description="Something went wrong while loading this page. Try it once more, or return home and continue from there."
+	primaryLabel="Try again"
+	secondaryLabel="Return home"
+	secondaryHref="/en/"
+	retry
+/>

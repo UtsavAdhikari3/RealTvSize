@@ -1,0 +1,138 @@
+---
+import '../styles/global.css';
+
+interface Props {
+	status: 404 | 500;
+	eyebrow: string;
+	title: string;
+	description: string;
+	primaryLabel: string;
+	primaryHref?: string;
+	secondaryLabel: string;
+	secondaryHref: string;
+	retry?: boolean;
+}
+
+const {
+	status,
+	eyebrow,
+	title,
+	description,
+	primaryLabel,
+	primaryHref = '/en/',
+	secondaryLabel,
+	secondaryHref,
+	retry = false,
+} = Astro.props;
+
+const pageTitle = `${status}: ${title} | RealTVSize`;
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" href="/favicon.ico" />
+		<meta name="theme-color" content="#fafafa" media="(prefers-color-scheme: light)" />
+		<meta name="theme-color" content="#090909" media="(prefers-color-scheme: dark)" />
+		<meta name="description" content={description} />
+		<meta name="robots" content="noindex, follow" />
+		<script is:inline>
+			const savedTheme = localStorage.getItem('realtvsize-theme');
+			if (savedTheme === 'dark' || (!savedTheme && matchMedia('(prefers-color-scheme: dark)').matches)) {
+				document.documentElement.classList.add('dark');
+			}
+		</script>
+		<title>{pageTitle}</title>
+	</head>
+	<body class="flex min-h-screen flex-col">
+		<a class="skip-link" href="#main-content">Skip to content</a>
+
+		<header class="border-b border-[var(--line)]">
+			<div class="site-shell flex h-14 items-center justify-between">
+				<a href="/en/" class="flex items-center gap-2 text-sm font-semibold tracking-[-0.02em] text-[var(--text)]" aria-label="RealTVSize home">
+					<span class="grid size-7 place-items-center rounded-md bg-[var(--text)] text-[var(--page-bg)]" aria-hidden="true">
+						<svg viewBox="0 0 24 24" class="size-4" fill="none" stroke="currentColor" stroke-width="1.8">
+							<rect x="3" y="5" width="18" height="12" rx="1.5"></rect>
+							<path d="M9 21h6M12 17v4"></path>
+						</svg>
+					</span>
+					<span translate="no">RealTVSize</span>
+				</a>
+
+				<span class="font-mono text-[10px] tracking-[0.08em] text-[var(--text-tertiary)] uppercase">Error {status}</span>
+			</div>
+		</header>
+
+		<main id="main-content" class="site-shell grid flex-1 place-items-center py-12 sm:py-20">
+			<section class="grid w-full max-w-5xl items-center gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20" aria-labelledby="error-heading">
+				<div>
+					<p class="eyebrow">{eyebrow}</p>
+					<h1 id="error-heading" class="mt-4 max-w-xl text-balance text-4xl leading-[1.05] font-semibold tracking-[-0.055em] text-[var(--text)] sm:text-5xl lg:text-6xl">
+						{title}
+					</h1>
+					<p class="mt-6 max-w-lg text-pretty text-base leading-7 text-[var(--text-secondary)] sm:text-lg">
+						{description}
+					</p>
+
+					<div class="mt-8 flex flex-col gap-3 sm:flex-row">
+						{retry ? (
+							<button
+								type="button"
+								data-retry
+								class="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-[var(--text)] px-5 text-sm font-medium text-[var(--page-bg)] transition-opacity hover:opacity-80"
+							>
+								<svg class="size-4" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 12a8 8 0 1 1-2.34-5.66L20 8.68M20 4v4.68h-4.68"></path></svg>
+								{primaryLabel}
+							</button>
+						) : (
+							<a href={primaryHref} class="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-[var(--text)] px-5 text-sm font-medium text-[var(--page-bg)] transition-opacity hover:opacity-80">
+								{primaryLabel}
+								<svg class="size-4" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m9 18 6-6-6-6"></path></svg>
+							</a>
+						)}
+						<a href={secondaryHref} class="inline-flex h-11 items-center justify-center rounded-lg border border-[var(--line)] bg-[var(--surface)] px-5 text-sm font-medium text-[var(--text-secondary)] transition-colors hover:border-[var(--line-strong)] hover:text-[var(--text)]">
+							{secondaryLabel}
+						</a>
+					</div>
+				</div>
+
+				<div class="panel relative isolate min-h-72 overflow-hidden p-6 sm:min-h-96 sm:p-10" aria-hidden="true">
+					<div class="absolute inset-0 -z-10 bg-[linear-gradient(var(--grid)_1px,transparent_1px),linear-gradient(90deg,var(--grid)_1px,transparent_1px)] bg-[size:24px_24px]"></div>
+					<div class="flex min-h-60 items-center justify-center sm:min-h-76">
+						<div class="w-full max-w-sm">
+							<div class="relative aspect-video rounded-[clamp(10px,2vw,16px)] border-[clamp(7px,1.5vw,12px)] border-[var(--tv-bezel)] bg-[var(--surface-soft)] shadow-float">
+								<div class="absolute inset-0 grid place-items-center overflow-hidden">
+									<svg class="h-full w-full text-[var(--line-strong)]" viewBox="0 0 320 180" fill="none" stroke="currentColor">
+										<path d="M-18 151 76 57l53 53 31-31 98 98M58 191l139-139 141 141" stroke-width="1"></path>
+										<circle cx="248" cy="46" r="15" stroke-width="1"></circle>
+									</svg>
+									<span class="absolute grid size-16 place-items-center rounded-full border border-[var(--line)] bg-[var(--surface-raised)] font-mono text-xl font-medium text-[var(--text)] shadow-card sm:size-20 sm:text-2xl">{status}</span>
+								</div>
+							</div>
+							<div class="mx-auto h-8 w-px bg-[var(--line-strong)]"></div>
+							<div class="mx-auto h-px w-24 bg-[var(--line-strong)]"></div>
+							<div class="mt-5 flex items-center justify-between font-mono text-[9px] tracking-[0.08em] text-[var(--text-tertiary)] uppercase">
+								<span>Signal status</span>
+								<span>{status === 404 ? 'Source not found' : 'Temporarily offline'}</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</main>
+
+		<footer class="site-shell flex flex-col gap-2 border-t border-[var(--line)] py-6 font-mono text-[10px] text-[var(--text-tertiary)] sm:flex-row sm:items-center sm:justify-between">
+			<p>© 2026 RealTVSize</p>
+			<p>See the screen before it enters the room.</p>
+		</footer>
+
+		{retry && (
+			<script>
+				document.querySelector('[data-retry]')?.addEventListener('click', () => window.location.reload());
+			</script>
+		)}
+	</body>
+</html>
