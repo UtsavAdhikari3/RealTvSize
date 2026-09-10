@@ -1,4 +1,5 @@
 ---
+import CalculatorToolbar from './CalculatorToolbar.astro';
 import RangeControl from './RangeControl.astro';
 import ResultCard from './ResultCard.astro';
 import RoomScene from './RoomScene.astro';
@@ -12,15 +13,7 @@ interface Props {
 
 const { t, primaryHeading = false } = Astro.props;
 const Heading = primaryHeading ? 'h1' : 'h2';
-const clientTranslations = {
-	common: t.common,
-	profiles: t.profiles,
-	simulation: t.simulation,
-	recommender: {
-		modeLabel: t.recommender.modeLabel,
-		liveResult: t.recommender.liveResult,
-	},
-};
+const clientTranslations = t;
 ---
 
 <section id="find-size" class="section-anchor site-shell py-28 sm:py-36" data-size-recommender data-i18n={JSON.stringify(clientTranslations)}>
@@ -39,12 +32,13 @@ const clientTranslations = {
 		</div>
 	</div>
 
+	<CalculatorToolbar t={t} id="recommendation" />
 	<div class="mt-12 grid items-start gap-5 lg:grid-cols-[minmax(300px,0.7fr)_minmax(0,1.45fr)] lg:gap-6">
 		<div class="panel order-2 p-5 sm:p-6 lg:order-1">
 			<p class="block text-xs font-medium text-[var(--text-tertiary)]">{t.recommender.myCouchIs}</p>
 			<div class="mt-2 flex items-end gap-2 border-b border-[var(--line)] pb-5">
 				<output id="recommended-distance-hero" for="room-distance" class="number text-5xl font-semibold tracking-[-0.06em] text-[var(--text)]">9.0</output>
-				<span class="pb-1 text-sm text-[var(--text-tertiary)]">{t.recommender.feetFromTv}</span>
+				<span data-from-tv class="pb-1 text-sm text-[var(--text-tertiary)]">{t.recommender.feetFromTv}</span>
 			</div>
 
 			<div class="py-6">
@@ -95,107 +89,10 @@ const clientTranslations = {
 		<ResultCard label={t.profiles.balanced.label} value={`65 ${t.common.inchesShort}`} id="balanced-size-result" note={t.recommender.fieldOfView30} />
 		<ResultCard label={t.profiles.relaxed.label} value={`55 ${t.common.inchesShort}`} id="relaxed-size-result" note={t.recommender.fieldOfView25} />
 	</div>
-	<p id="recommendation-live" class="sr-only" aria-live="polite"></p>
+	<div class="cross-tool-links"><a data-fit-link href="will-it-fit?fit-size=65">{t.tools.checkFit}</a></div>
+    <p id="recommendation-live" class="sr-only" aria-live="polite"></p>
 </section>
 
 <script>
-	import { diagonalForDistance, format, nearestCommonSize, updateUrl } from '../scripts/tv-math';
-	import { animateValue, cancelAnimation, updateSimulationVisuals, type SimulationTranslations } from '../scripts/simulation-dom';
-	import { interpolate, type Translation } from '../i18n/types';
-
-	const root = document.querySelector<HTMLElement>('[data-size-recommender]');
-	if (root) {
-		const t = JSON.parse(root.dataset.i18n!) as SimulationTranslations & {
-			recommender: Pick<Translation['recommender'], 'modeLabel' | 'liveResult'>;
-		};
-		const distanceInput = root.querySelector<HTMLInputElement>('#room-distance')!;
-		const room = root.querySelector<HTMLElement>('[data-room-scene]')!;
-		const pov = root.querySelector<HTMLElement>('[data-viewer-pov]')!;
-		const modes = ['immersive', 'balanced', 'relaxed'] as const;
-		let selectedMode: (typeof modes)[number] = 'balanced';
-		let displayedSize = 65;
-
-		const setText = (selector: string, text: string) => {
-			const element = root.querySelector<HTMLElement>(selector);
-			if (element) element.textContent = text;
-		};
-
-		function styleButtons() {
-			root.querySelectorAll<HTMLButtonElement>('[data-recommendation-mode]').forEach((button) => {
-				const active = button.dataset.recommendationMode === selectedMode;
-				button.setAttribute('aria-pressed', String(active));
-				button.style.borderColor = active ? 'var(--text)' : '';
-				button.style.background = active ? 'var(--text)' : '';
-				button.style.color = active ? 'var(--page-bg)' : '';
-				button.querySelectorAll<HTMLElement>('span, strong, small').forEach((span) => {
-					span.style.color = active ? 'inherit' : '';
-				});
-			});
-		}
-
-		function render(syncUrl = true, visualSize?: number) {
-			const distance = Number(distanceInput.value);
-			const recommendations = Object.fromEntries(modes.map((mode) => [mode, nearestCommonSize(diagonalForDistance(distance, mode))])) as Record<(typeof modes)[number], number>;
-			const selectedSize = recommendations[selectedMode];
-			const simulationSize = visualSize ?? selectedSize;
-			const minSize = Math.min(...Object.values(recommendations));
-			const maxSize = Math.max(...Object.values(recommendations));
-			const { fov, profile } = updateSimulationVisuals(room, pov, simulationSize, distance, 4, t);
-			displayedSize = simulationSize;
-
-			root.querySelector<HTMLOutputElement>('#room-distance-output')!.textContent = `${format(distance)}\u00a0${t.common.feetShort}`;
-			setText('#recommended-distance-hero', format(distance));
-			modes.forEach((mode) => {
-				setText(`#${mode}-size-button`, `${recommendations[mode]}${t.common.inchSymbol}`);
-				setText(`#${mode}-size-result`, `${recommendations[mode]} ${t.common.inchesShort}`);
-			});
-			setText('#recommended-size', String(Math.round(simulationSize)));
-			setText('#recommended-size-card', `${selectedSize} ${t.common.inchesShort}`);
-			setText('#size-range', `${minSize}–${maxSize} ${t.common.inchesShort}`);
-			setText('#recommended-mode-label', interpolate(t.recommender.modeLabel, {
-				mode: t.profiles[selectedMode].label,
-				fov: format(fov, 0),
-			}));
-			if (syncUrl) {
-				setText('#recommendation-live', interpolate(t.recommender.liveResult, {
-					distance: format(distance),
-					size: selectedSize,
-					mode: t.profiles[selectedMode].label,
-					fov: format(fov, 0),
-					message: profile.message,
-				}));
-			}
-			styleButtons();
-
-			const progress = ((distance - 4) / 14) * 100;
-			distanceInput.style.setProperty('--range-progress', `${progress}%`);
-			if (syncUrl) updateUrl({ room: distance.toFixed(1), style: selectedMode });
-		}
-
-		distanceInput.addEventListener('input', () => render());
-		distanceInput.addEventListener('pointerdown', () => cancelAnimation(root));
-		root.querySelectorAll<HTMLButtonElement>('[data-recommendation-mode]').forEach((button) => {
-			button.addEventListener('click', () => {
-				const startSize = displayedSize;
-				selectedMode = button.dataset.recommendationMode as typeof selectedMode;
-				const distance = Number(distanceInput.value);
-				const targetSize = nearestCommonSize(diagonalForDistance(distance, selectedMode));
-				animateValue(
-					root,
-					startSize,
-					targetSize,
-					(value) => render(false, value),
-					() => render(true),
-				);
-			});
-		});
-		window.addEventListener('resize', () => render(false), { passive: true });
-
-		const params = new URLSearchParams(location.search);
-		const roomDistance = Number(params.get('room'));
-		const style = params.get('style');
-		if (roomDistance >= 4 && roomDistance <= 18) distanceInput.value = String(roomDistance);
-		if (modes.includes(style as typeof selectedMode)) selectedMode = style as typeof selectedMode;
-		render(false);
-	}
+	import '../scripts/viewing-calculators';
 </script>

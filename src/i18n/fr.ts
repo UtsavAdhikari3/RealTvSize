@@ -1,19 +1,23 @@
+import { frTools } from './tools';
 import type { Translation } from './types';
 
 const fr = {
+	tools: frTools,
 	languageName: 'Français',
 	pageTitles: {
+		willItFit: frTools.fitTitle + ' | RealTVSize',
 		home: 'RealTVSize', compare: 'Comparer les tailles de TV | RealTVSize', viewingDistance: 'Distance de visionnage | RealTVSize', findMyTvSize: 'Trouver ma taille de TV | RealTVSize', about: 'À propos | RealTVSize', contact: 'Nous contacter | RealTVSize', privacyPolicy: 'Politique de confidentialité | RealTVSize', termsAndConditions: 'Conditions générales | RealTVSize',
 	},
 	common: {
 		skipToContent: 'Aller au contenu', degrees: '°', inchSymbol: '″', inchesShort: 'po', feetShort: 'pi', squareInchesShort: 'po²', separator: '·',
 	},
 	navigation: {
+		willItFit: frTools.fitTitle,
 		primaryLabel: 'Navigation principale', footerLabel: 'Navigation du pied de page', home: 'Accueil', compare: 'Comparer les tailles de TV', viewingDistance: 'Distance de visionnage', findMyTvSize: 'Trouver ma taille de TV', about: 'À propos', contact: 'Nous contacter', privacyPolicy: 'Confidentialité', termsAndConditions: 'Conditions générales', more: 'Plus', language: 'Langue', homeAria: 'Accueil RealTVSize',
 	},
 	theme: { switchToDark: 'Passer au mode sombre', switchToLight: 'Passer au mode clair' },
 	footer: {
-		tagline: "Voyez l’écran avant qu’il n’entre dans la pièce.", copyright: '© 2026 RealTVSize', disclaimer: "Les dimensions supposent un écran 16:9 et n’incluent pas la largeur du cadre.",
+		tagline: "Voyez l’écran avant qu’il n’entre dans la pièce.", copyright: '© 2026 RealTVSize', disclaimer: frTools.estimateNote,
 	},
 	profiles: {
 		veryImmersive: { label: 'Très immersif', message: 'Une vue rapprochée très immersive' },

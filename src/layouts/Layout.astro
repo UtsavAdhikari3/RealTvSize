@@ -102,13 +102,14 @@ const ogLocales: Record<Language, string> = {
 		</script>
 
 		<script is:inline>
-			const savedTheme = localStorage.getItem('realtvsize-theme');
+			let savedTheme = null;
+			try { savedTheme = localStorage.getItem('realtvsize-theme'); } catch {}
 			if (savedTheme === 'dark' || (!savedTheme && matchMedia('(prefers-color-scheme: dark)').matches)) {
 				document.documentElement.classList.add('dark');
 			}
 		</script>
 		<title>{title}</title>
-		{structuredData && <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />}
+		{structuredData && <script is:inline type="application/ld+json" set:html={JSON.stringify(structuredData)} />}
 	</head>
 	<body>
 		<a class="skip-link" href="#main-content">{t.common.skipToContent}</a>

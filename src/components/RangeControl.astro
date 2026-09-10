@@ -17,11 +17,11 @@ const { id, label, min, max, step = 1, value, outputId, suffix, name = id } = As
 <div class="range-control min-w-0">
 	<div class="mb-3 flex items-center justify-between gap-4">
 		<label for={id} class="text-sm font-medium text-[var(--text-secondary)]">{label}</label>
-		<output id={outputId} for={id} class="number min-w-16 rounded-md border border-[var(--line)] bg-[var(--surface)] px-2.5 py-1 text-right font-mono text-sm text-[var(--text)]">
-			{value}{suffix}
-		</output>
+		<div class="numeric-entry"><input data-number type="text" inputmode="decimal" value={value} aria-label={`${label} (${suffix})`} aria-describedby={`${id}-error`} autocomplete="off" /><span data-number-unit aria-hidden="true">{suffix}</span></div>
+		<output id={outputId} for={id} class="sr-only">{value}{suffix}</output>
 	</div>
-	<input
+    <p data-error id={`${id}-error`} class="input-error" hidden></p>
+    <input
 		id={id}
 		name={name}
 		type="range"
@@ -33,7 +33,7 @@ const { id, label, min, max, step = 1, value, outputId, suffix, name = id } = As
 		class="range-input"
 	/>
 	<div class="mt-2 flex justify-between font-mono text-[10px] text-[var(--text-tertiary)]" aria-hidden="true">
-		<span>{min}{suffix}</span><span>{max}{suffix}</span>
+		<span data-min>{min}{suffix}</span><span data-max>{max}{suffix}</span>
 	</div>
 </div>
 

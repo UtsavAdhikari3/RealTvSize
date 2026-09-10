@@ -1,6 +1,9 @@
+import { enTools } from './tools';
 const en = {
+	tools: enTools,
 	languageName: 'English',
 	pageTitles: {
+		willItFit: enTools.fitTitle + ' | RealTVSize',
 		home: 'TV Size Calculator for Room & Viewing Distance | RealTVSize',
 		compare: 'Compare TV Sizes | RealTVSize',
 		viewingDistance: 'Viewing Distance | RealTVSize',
@@ -20,6 +23,7 @@ const en = {
 		separator: '·',
 	},
 	navigation: {
+		willItFit: enTools.fitTitle,
 		primaryLabel: 'Primary navigation',
 		footerLabel: 'Footer navigation',
 		home: 'Home',
@@ -41,7 +45,7 @@ const en = {
 	footer: {
 		tagline: 'See the screen before it enters the room.',
 		copyright: '© 2026 RealTVSize',
-		disclaimer: 'Dimensions assume a 16:9 display and exclude bezel width.',
+		disclaimer: enTools.estimateNote,
 	},
 	profiles: {
 		veryImmersive: {

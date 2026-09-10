@@ -2,6 +2,7 @@ import type { Language } from './config';
 
 export const pagePaths = {
 	home: '',
+	willItFit: '/will-it-fit',
 	compare: '/compare',
 	viewingDistance: '/viewing-distance',
 	findMyTvSize: '/find-my-tv-size',

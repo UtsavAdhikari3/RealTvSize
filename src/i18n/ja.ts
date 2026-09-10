@@ -1,19 +1,23 @@
+import { jaTools } from './tools';
 import type { Translation } from './types';
 
 const ja = {
+	tools: jaTools,
 	languageName: '日本語',
 	pageTitles: {
+		willItFit: jaTools.fitTitle + ' | RealTVSize',
 		home: 'RealTVSize', compare: 'テレビサイズを比較 | RealTVSize', viewingDistance: '視聴距離 | RealTVSize', findMyTvSize: '最適なテレビサイズを探す | RealTVSize', about: '私たちについて | RealTVSize', contact: 'お問い合わせ | RealTVSize', privacyPolicy: 'プライバシーポリシー | RealTVSize', termsAndConditions: '利用規約 | RealTVSize',
 	},
 	common: {
 		skipToContent: '本文へ移動', degrees: '°', inchSymbol: '″', inchesShort: 'インチ', feetShort: 'ft', squareInchesShort: '平方インチ', separator: '·',
 	},
 	navigation: {
+		willItFit: jaTools.fitTitle,
 		primaryLabel: 'メインナビゲーション', footerLabel: 'フッターナビゲーション', home: 'ホーム', compare: 'テレビサイズを比較', viewingDistance: '視聴距離', findMyTvSize: '最適なテレビサイズを探す', about: '私たちについて', contact: 'お問い合わせ', privacyPolicy: 'プライバシー', termsAndConditions: '利用規約', more: 'その他', language: '言語', homeAria: 'RealTVSize ホーム',
 	},
 	theme: { switchToDark: 'ダークモードに切り替える', switchToLight: 'ライトモードに切り替える' },
 	footer: {
-		tagline: '部屋に置く前に、画面の大きさを確かめましょう。', copyright: '© 2026 RealTVSize', disclaimer: '寸法は16:9ディスプレイを前提とし、ベゼル幅は含みません。',
+		tagline: '部屋に置く前に、画面の大きさを確かめましょう。', copyright: '© 2026 RealTVSize', disclaimer: jaTools.estimateNote,
 	},
 	profiles: {
 		veryImmersive: { label: '非常に没入感が高い', message: '間近で見る、非常に没入感の高い映像' },

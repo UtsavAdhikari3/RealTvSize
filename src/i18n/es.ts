@@ -1,8 +1,11 @@
+import { esTools } from './tools';
 import type { Translation } from './types';
 
 const es = {
+	tools: esTools,
 	languageName: 'Español',
 	pageTitles: {
+		willItFit: esTools.fitTitle + ' | RealTVSize',
 		home: 'RealTVSize',
 		compare: 'Comparar tamaños de TV | RealTVSize',
 		viewingDistance: 'Distancia de visualización | RealTVSize',
@@ -22,6 +25,7 @@ const es = {
 		separator: '·',
 	},
 	navigation: {
+		willItFit: esTools.fitTitle,
 		primaryLabel: 'Navegación principal',
 		footerLabel: 'Navegación del pie de página',
 		home: 'Inicio',
@@ -43,7 +47,7 @@ const es = {
 	footer: {
 		tagline: 'Mira la pantalla antes de llevarla a la habitación.',
 		copyright: '© 2026 RealTVSize',
-		disclaimer: 'Las dimensiones suponen una pantalla 16:9 y no incluyen el ancho del marco.',
+		disclaimer: esTools.estimateNote,
 	},
 	profiles: {
 		veryImmersive: { label: 'Muy inmersiva', message: 'Una vista muy inmersiva y cercana' },

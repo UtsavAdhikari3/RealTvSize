@@ -1,0 +1,11 @@
+---
+import type { Translation } from '../i18n/types';
+interface Props { t: Translation; id: string }
+const { t, id } = Astro.props;
+---
+<div class="calculator-toolbar">
+	<label>{t.tools.units}<select data-units><option value="imperial">{t.tools.imperial}</option><option value="metric">{t.tools.metric}</option></select></label>
+	<button type="button" data-copy>{t.tools.copy}</button>
+	<span data-share-status role="status"></span>
+	<div data-share-fallback hidden><label for={`${id}-share`}>{t.tools.manual}</label><input id={`${id}-share`} type="text" readonly /></div>
+</div>

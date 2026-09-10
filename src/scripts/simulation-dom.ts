@@ -1,7 +1,8 @@
+import { displayDistance, distance as measuredDistance, distanceUnit, getUnits } from './calculator-dom';
 import { apparentViewScale, format, horizontalFov, viewProfile } from './tv-math';
 import { interpolate, type Translation } from '../i18n/types';
 
-export type SimulationTranslations = Pick<Translation, 'common' | 'profiles' | 'simulation'>;
+export type SimulationTranslations = Pick<Translation, 'common' | 'profiles' | 'simulation' | 'tools'>;
 
 const activeAnimations = new WeakMap<Element, number>();
 
@@ -107,7 +108,7 @@ export function updateSimulationVisuals(
 	track.style.setProperty('--distance-scale', String(distanceScale));
 	couch.style.setProperty('--couch-y', `${couchShift}%`);
 	couch.style.setProperty('--couch-scale', String(couchScale));
-	distanceReadout.textContent = `${format(distance)}\u00a0${t.common.feetShort}`;
+	distanceReadout.textContent = measuredDistance(distance);
 	cone.setAttribute('points', `500,${viewerY} ${leftEdge},${tvCenterY} ${rightEdge},${tvCenterY}`);
 	leftRay.setAttribute('x1', '500');
 	leftRay.setAttribute('y1', String(viewerY));
@@ -121,9 +122,10 @@ export function updateSimulationVisuals(
 	fovReadout.style.setProperty('--fov-label-y', `${(viewerY / 620) * 100}%`);
 	roomFov.textContent = interpolate(t.simulation.fieldOfView, { fov: format(fov, 0) });
 	roomProfile.textContent = profile.label;
-	room.setAttribute('aria-label', interpolate(t.simulation.roomAria, {
+	room.setAttribute('aria-label', interpolate(t.tools.simulation, {
 		size: tvSize,
-		distance: format(distance),
+		distance: format(displayDistance(distance), getUnits() === 'metric' ? 2 : 1),
+		unit: distanceUnit(), message: profile.message,
 		fov: format(fov, 0),
 	}));
 
@@ -134,13 +136,14 @@ export function updateSimulationVisuals(
 	const povMessage = pov.querySelector<HTMLElement>('[data-pov-message]')!;
 	povTv.style.setProperty('--tv-scale', String(apparentViewScale(tvSize, distance)));
 	povTv.setAttribute('aria-label', interpolate(t.simulation.tvAria, { label: t.simulation.viewpointTv, size: tvSize }));
-	povDistance.textContent = `${format(distance)}\u00a0${t.common.feetShort}`;
+	povDistance.textContent = measuredDistance(distance);
 	povFov.textContent = interpolate(t.simulation.fieldOfView, { fov: format(fov, 0) });
 	povProfile.textContent = profile.label;
 	povMessage.textContent = profile.message;
-	pov.setAttribute('aria-label', interpolate(t.simulation.povAria, {
+	pov.setAttribute('aria-label', interpolate(t.tools.simulation, {
 		size: tvSize,
-		distance: format(distance),
+		distance: format(displayDistance(distance), getUnits() === 'metric' ? 2 : 1),
+		unit: distanceUnit(), message: profile.message,
 		fov: format(fov, 0),
 	}));
 

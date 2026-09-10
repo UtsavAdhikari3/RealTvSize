@@ -1,0 +1,12 @@
+---
+import WillItFit from '../../components/WillItFit.astro';
+import { getLanguageStaticPaths, type Language } from '../../i18n/config';
+import type { Translation } from '../../i18n/types';
+import Layout from '../../layouts/Layout.astro';
+export const getStaticPaths = getLanguageStaticPaths;
+interface Props { lang: Language; t: Translation }
+const { lang, t } = Astro.props;
+---
+<Layout title={t.pageTitles.willItFit} lang={lang} page="willItFit" t={t} description={t.tools.fitIntro}>
+	<WillItFit t={t} primaryHeading />
+</Layout>

@@ -1,4 +1,5 @@
 ---
+import CalculatorToolbar from './CalculatorToolbar.astro';
 import MeasurementLabel from './MeasurementLabel.astro';
 import RangeControl from './RangeControl.astro';
 import ResultCard from './ResultCard.astro';
@@ -10,17 +11,7 @@ interface Props {
 }
 
 const { t } = Astro.props;
-const clientTranslations = {
-	common: t.common,
-	comparison: {
-		liveResult: t.comparison.liveResult,
-		tvA: t.comparison.tvA,
-		tvB: t.comparison.tvB,
-	},
-	simulation: {
-		tvAria: t.simulation.tvAria,
-	},
-};
+const clientTranslations = t;
 const tvAAria = interpolate(t.simulation.tvAria, { label: t.comparison.tvA, size: 65 });
 const tvBAria = interpolate(t.simulation.tvAria, { label: t.comparison.tvB, size: 85 });
 ---
@@ -36,6 +27,7 @@ const tvBAria = interpolate(t.simulation.tvAria, { label: t.comparison.tvB, size
 		</p>
 	</div>
 
+	<CalculatorToolbar t={t} id="compare" />
 	<div class="panel relative mt-12 overflow-hidden sm:mt-16">
 		<div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(0,112,243,0.08),transparent_36%)]" aria-hidden="true"></div>
 		<div class="relative border-b border-[var(--line)] px-4 py-4 sm:px-6">
@@ -52,7 +44,24 @@ const tvBAria = interpolate(t.simulation.tvAria, { label: t.comparison.tvB, size
 			</div>
 		</div>
 
-		<div class="comparison-stage relative min-h-[330px] overflow-hidden border-b border-[var(--line)] px-3 pt-12 sm:min-h-[490px] sm:px-10 sm:pt-16">
+		<div class="comparison-controls">
+            <div role="group" aria-label={t.tools.view} class="segmented">
+                <button type="button" data-view="side" aria-pressed="true">{t.tools.side}</button>
+                <button type="button" data-view="overlay" aria-pressed="false">{t.tools.overlay}</button>
+            </div>
+            <div data-alignment hidden role="group" aria-label={t.tools.alignment} class="segmented">
+                <button type="button" data-align="center" aria-pressed="true">{t.tools.center}</button>
+                <button type="button" data-align="bottom" aria-pressed="false">{t.tools.bottom}</button>
+            </div>
+        </div>
+        <div data-overlay-stage hidden>
+            <div class="overlay-legend"><span data-overlay-label="a"></span><span data-overlay-label="b"></span></div>
+            <svg viewBox="0 0 1000 520" role="img" aria-label={t.tools.overlay}>
+                <rect data-overlay-tv="a" class="overlay-a" />
+                <rect data-overlay-tv="b" class="overlay-b" />
+            </svg>
+        </div>
+        <div class="comparison-stage relative min-h-[330px] overflow-hidden border-b border-[var(--line)] px-3 pt-12 sm:min-h-[490px] sm:px-10 sm:pt-16">
 			<div class="stage-grid absolute inset-0" aria-hidden="true"></div>
 			<div class="absolute inset-x-0 bottom-12 h-px bg-[var(--line-strong)] sm:bottom-16" aria-hidden="true"></div>
 			<div class="relative z-10 grid h-full min-h-[280px] grid-cols-2 items-end gap-3 sm:min-h-[420px] sm:gap-10">
@@ -96,89 +105,12 @@ const tvBAria = interpolate(t.simulation.tvAria, { label: t.comparison.tvB, size
 		<ResultCard label={t.comparison.screenAreaDifference} value={`1,282 ${t.common.squareInchesShort}`} id="area-diff" />
 		<ResultCard label={t.comparison.heightPair} value={`31.9 / 41.7 ${t.common.inchesShort}`} id="height-pair" />
 	</div>
-	<p id="comparison-live" class="sr-only" aria-live="polite"></p>
+	<div class="cross-tool-links"><a data-fit-link="a" href="will-it-fit?fit-size=65">{t.tools.checkFit}: {t.comparison.tvA}</a><a data-fit-link="b" href="will-it-fit?fit-size=85">{t.tools.checkFit}: {t.comparison.tvB}</a></div>
+    <p id="comparison-live" class="sr-only" aria-live="polite"></p>
 </section>
 
 <script>
-	import { dimensions, format, updateUrl } from '../scripts/tv-math';
-	import { interpolate, type Translation } from '../i18n/types';
-
-	const root = document.querySelector<HTMLElement>('[data-comparison]');
-	if (root) {
-		const t = JSON.parse(root.dataset.i18n!) as {
-			common: Translation['common'];
-			comparison: Pick<Translation['comparison'], 'liveResult' | 'tvA' | 'tvB'>;
-			simulation: Pick<Translation['simulation'], 'tvAria'>;
-		};
-		const inputA = root.querySelector<HTMLInputElement>('#tv-a-input')!;
-		const inputB = root.querySelector<HTMLInputElement>('#tv-b-input')!;
-		const outputA = root.querySelector<HTMLOutputElement>('#tv-a-output')!;
-		const outputB = root.querySelector<HTMLOutputElement>('#tv-b-output')!;
-		const visualA = root.querySelector<HTMLElement>('#tv-a-visual')!;
-		const visualB = root.querySelector<HTMLElement>('#tv-b-visual')!;
-
-		const setText = (selector: string, value: string) => {
-			const element = root.querySelector<HTMLElement>(selector);
-			if (element) element.textContent = value;
-		};
-
-		function setRangeProgress(input: HTMLInputElement) {
-			const progress = ((Number(input.value) - Number(input.min)) / (Number(input.max) - Number(input.min))) * 100;
-			input.style.setProperty('--range-progress', `${progress}%`);
-		}
-
-		function render(syncUrl = true) {
-			const sizeA = Number(inputA.value);
-			const sizeB = Number(inputB.value);
-			const a = dimensions(sizeA);
-			const b = dimensions(sizeB);
-			const maxSize = Math.max(sizeA, sizeB);
-			const smallArea = Math.min(a.area, b.area);
-			const largeArea = Math.max(a.area, b.area);
-
-			visualA.style.setProperty('--tv-scale', String(sizeA / maxSize));
-			visualB.style.setProperty('--tv-scale', String(sizeB / maxSize));
-			visualA.setAttribute('aria-label', interpolate(t.simulation.tvAria, { label: t.comparison.tvA, size: sizeA }));
-			visualB.setAttribute('aria-label', interpolate(t.simulation.tvAria, { label: t.comparison.tvB, size: sizeB }));
-			outputA.textContent = `${sizeA}${t.common.inchSymbol}`;
-			outputB.textContent = `${sizeB}${t.common.inchSymbol}`;
-			setText('#tv-a-size-badge', `${sizeA} ${t.common.inchesShort}`);
-			setText('#tv-b-size-badge', `${sizeB} ${t.common.inchesShort}`);
-			setText('#tv-a-width', `${format(a.width)} ${t.common.inchesShort}`);
-			setText('#tv-b-width', `${format(b.width)} ${t.common.inchesShort}`);
-			setText('#diagonal-diff', `${format(Math.abs(sizeB - sizeA))} ${t.common.inchesShort}`);
-			setText('#width-diff', `${format(Math.abs(b.width - a.width))} ${t.common.inchesShort}`);
-			setText('#height-diff', `${format(Math.abs(b.height - a.height))} ${t.common.inchesShort}`);
-			setText('#area-increase', `${format(((largeArea - smallArea) / smallArea) * 100)}%`);
-			setText('#area-diff', `${format(Math.abs(b.area - a.area), 0)} ${t.common.squareInchesShort}`);
-			setText('#height-pair', `${format(a.height)} / ${format(b.height)} ${t.common.inchesShort}`);
-			setText('#comparison-live', interpolate(t.comparison.liveResult, {
-				sizeA,
-				sizeB,
-				increase: format(((largeArea - smallArea) / smallArea) * 100),
-			}));
-			setRangeProgress(inputA);
-			setRangeProgress(inputB);
-			if (syncUrl) updateUrl({ tv1: sizeA, tv2: sizeB });
-		}
-
-		[inputA, inputB].forEach((input) => input.addEventListener('input', () => render()));
-		root.querySelectorAll<HTMLButtonElement>('[data-pair]').forEach((button) => {
-			button.addEventListener('click', () => {
-				const [a, b] = button.dataset.pair!.split(',');
-				inputA.value = a;
-				inputB.value = b;
-				render();
-			});
-		});
-
-		const params = new URLSearchParams(location.search);
-		const queryA = Number(params.get('tv1'));
-		const queryB = Number(params.get('tv2'));
-		if (queryA >= 32 && queryA <= 115) inputA.value = String(queryA);
-		if (queryB >= 32 && queryB <= 115) inputB.value = String(queryB);
-		render(false);
-	}
+	import '../scripts/comparison';
 </script>
 
 <style>

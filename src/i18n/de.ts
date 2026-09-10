@@ -1,8 +1,11 @@
+import { deTools } from './tools';
 import type { Translation } from './types';
 
 const de = {
+	tools: deTools,
 	languageName: 'Deutsch',
 	pageTitles: {
+		willItFit: deTools.fitTitle + ' | RealTVSize',
 		home: 'RealTVSize',
 		compare: 'TV-Größen vergleichen | RealTVSize',
 		viewingDistance: 'Sitzabstand | RealTVSize',
@@ -16,11 +19,12 @@ const de = {
 		skipToContent: 'Zum Inhalt springen', degrees: '°', inchSymbol: '″', inchesShort: 'Zoll', feetShort: 'ft', squareInchesShort: 'Quadratzoll', separator: '·',
 	},
 	navigation: {
+		willItFit: deTools.fitTitle,
 		primaryLabel: 'Hauptnavigation', footerLabel: 'Fußzeilennavigation', home: 'Startseite', compare: 'TV-Größen vergleichen', viewingDistance: 'Sitzabstand', findMyTvSize: 'Meine TV-Größe finden', about: 'Über uns', contact: 'Kontakt', privacyPolicy: 'Datenschutz', termsAndConditions: 'AGB', more: 'Mehr', language: 'Sprache', homeAria: 'RealTVSize-Startseite',
 	},
 	theme: { switchToDark: 'Zum dunklen Modus wechseln', switchToLight: 'Zum hellen Modus wechseln' },
 	footer: {
-		tagline: 'Sieh den Bildschirm, bevor er ins Zimmer kommt.', copyright: '© 2026 RealTVSize', disclaimer: 'Die Maße gehen von einem 16:9-Display aus und schließen die Rahmenbreite aus.',
+		tagline: 'Sieh den Bildschirm, bevor er ins Zimmer kommt.', copyright: '© 2026 RealTVSize', disclaimer: deTools.estimateNote,
 	},
 	profiles: {
 		veryImmersive: { label: 'Sehr immersiv', message: 'Eine sehr immersive Ansicht aus nächster Nähe' },

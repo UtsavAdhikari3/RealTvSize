@@ -1,0 +1,57 @@
+---
+import CalculatorToolbar from './CalculatorToolbar.astro';
+import RangeControl from './RangeControl.astro';
+import type { Translation } from '../i18n/types';
+interface Props { t: Translation; primaryHeading?: boolean }
+const { t, primaryHeading = false } = Astro.props;
+const Heading = primaryHeading ? 'h1' : 'h2';
+const fields = [
+	{ key: 'width', label: t.tools.width },
+	{ key: 'height', label: t.tools.height },
+	{ key: 'clearance', label: t.tools.clearance },
+] as const;
+---
+<section id="will-it-fit" class="site-shell section-anchor fit-section" data-fit data-i18n={JSON.stringify(t)}>
+	<p class="eyebrow">{t.tools.checkFit}</p>
+	<Heading>{t.tools.fitTitle}</Heading>
+	<p class="fit-intro">{t.tools.fitIntro}</p>
+	<CalculatorToolbar t={t} id="fit" />
+	<div class="fit-layout">
+		<div class="panel fit-controls">
+			<label class="fit-field">{t.tools.mode}<select data-fit-mode><option value="estimate">{t.tools.estimate}</option><option value="exact">{t.tools.exact}</option></select></label>
+			<RangeControl id="fit-diagonal" outputId="fit-diagonal-output" label={t.tools.diagonal} min={32} max={115} value={65} suffix=" in" />
+			{fields.map(({key, label}) => <label class="fit-field" for={`fit-${key}`}><span>{label} (<span data-length-unit>in</span>)</span><input type="text" inputmode="decimal" id={`fit-${key}`} data-fit-field={key} aria-describedby={`fit-${key}-error`} autocomplete="off" value={key === 'clearance' ? '0' : ''} /><span class="input-error" id={`fit-${key}-error`} data-fit-error={key} hidden></span></label>)}
+			<div data-exact-fields hidden>
+				<p class="fit-note">{t.tools.exactNote}</p>
+				{[{key: 'tvWidth', label: t.tools.tvWidth}, {key: 'tvHeight', label: t.tools.tvHeight}].map(({key, label}) => <label class="fit-field" for={`fit-${key}`}><span>{label} (<span data-length-unit>in</span>)</span><input type="text" inputmode="decimal" id={`fit-${key}`} data-fit-field={key} aria-describedby={`fit-${key}-error`} autocomplete="off" /><span class="input-error" id={`fit-${key}-error`} data-fit-error={key} hidden></span></label>)}
+			</div>
+		</div>
+		<div class="panel fit-preview">
+			<p data-fit-status>{t.tools.blank}</p>
+			<p data-fit-live class="sr-only" role="status"></p>
+			<div data-fit-results hidden>
+				<p data-fit-scope class="fit-note"></p>
+				<svg data-fit-diagram viewBox="0 0 800 440" role="img" aria-label={t.tools.fitTitle}>
+					<rect data-space-rect class="fit-space" />
+					<path data-width-guides class="fit-space" fill="none" />
+					<rect data-clearance-rect class="fit-clearance" />
+					<rect data-tv-rect class="fit-tv" />
+				</svg>
+				<div class="fit-legend"><span class="space-key">{t.tools.space}</span><span class="tv-key">{t.tools.television}</span><span class="clearance-key">{t.tools.clearanceLegend}</span></div>
+				<dl class="fit-metrics">
+					<div><dt>{t.tools.dimensions}</dt><dd data-fit-dimensions></dd></div>
+					<div><dt>{t.tools.horizontal}</dt><dd data-fit-horizontal></dd></div>
+					<div data-height-result><dt>{t.tools.vertical}</dt><dd data-fit-vertical></dd></div>
+					<div><dt>{t.tools.overflowX}</dt><dd data-fit-overflow-x></dd></div>
+					<div data-height-result><dt>{t.tools.overflowY}</dt><dd data-fit-overflow-y></dd></div>
+					<div data-largest-result><dt>{t.tools.largest}</dt><dd data-fit-largest></dd></div>
+				</dl>
+			</div>
+			<p class="fit-note">{t.tools.estimateNote}</p>
+			<p class="fit-note">{t.tools.guidance}</p>
+		</div>
+	</div>
+</section>
+<script>
+	import '../scripts/fit-calculator';
+</script>

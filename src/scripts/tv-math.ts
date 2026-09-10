@@ -62,11 +62,54 @@ export function nearestCommonSize(size: number) {
 	);
 }
 
-export function format(value: number, digits = 1) {
-	return new Intl.NumberFormat('en-US', {
+export function format(value: number, digits = 1, locale = typeof document === 'undefined' ? 'en' : document.documentElement.lang) {
+	return new Intl.NumberFormat(locale, {
 		minimumFractionDigits: digits,
 		maximumFractionDigits: digits,
 	}).format(value);
+}
+
+export type Units = 'imperial' | 'metric';
+export const inchesToCm = (value: number) => value * 2.54;
+export const cmToInches = (value: number) => value / 2.54;
+export const feetToMeters = (value: number) => value * 0.3048;
+export const metersToFeet = (value: number) => value / 0.3048;
+export const squareInchesToCm = (value: number) => value * 2.54 ** 2;
+
+export interface FitInput {
+	mode: 'estimate' | 'exact';
+	diagonal: number;
+	width: number | null;
+	height: number | null;
+	clearance: number;
+	tvWidth: number | null;
+	tvHeight: number | null;
+}
+
+export function calculateFit(input: FitInput) {
+	const positive = (n: number | null): n is number => n !== null && Number.isFinite(n) && n > 0;
+	if (!positive(input.width) || (input.height !== null && !positive(input.height)) ||
+		!Number.isFinite(input.clearance) || input.clearance < 0 ||
+		!Number.isInteger(input.diagonal) || input.diagonal < 32 || input.diagonal > 115 ||
+		!['estimate', 'exact'].includes(input.mode)) return null;
+	if (input.mode === 'exact' && (!positive(input.tvWidth) || !positive(input.tvHeight))) return null;
+	const tv = input.mode === 'exact'
+		? { width: input.tvWidth!, height: input.tvHeight! }
+		: dimensions(input.diagonal);
+	const availableWidth = input.width - 2 * input.clearance;
+	const availableHeight = input.height === null ? null : input.height - 2 * input.clearance;
+	const horizontalRemaining = availableWidth - tv.width;
+	const verticalRemaining = availableHeight === null ? null : availableHeight - tv.height;
+	// A tiny floating point tolerance preserves exact converted boundaries.
+	const fits = horizontalRemaining >= -1e-10 && (verticalRemaining === null || verticalRemaining >= -1e-10);
+	const largest = input.mode === 'exact' ? null : [...commonTvSizes].reverse().find((size) => {
+		const d = dimensions(size);
+		return d.width <= availableWidth + 1e-10 && (availableHeight === null || d.height <= availableHeight + 1e-10);
+	}) ?? null;
+	return { tv, fits, widthOnly: input.height === null, largest,
+		horizontalRemaining: Math.abs(horizontalRemaining) < 1e-10 ? 0 : horizontalRemaining,
+		verticalRemaining: verticalRemaining !== null && Math.abs(verticalRemaining) < 1e-10 ? 0 : verticalRemaining,
+		horizontalOverflow: Math.max(0, -horizontalRemaining), verticalOverflow: Math.max(0, -(verticalRemaining ?? 0)) };
 }
 
 export function updateUrl(values: Record<string, string | number>) {
