@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
-import { defaultLanguage, languages } from '../i18n/config';
-import { localizedPath, pagePaths, type PageId } from '../i18n/routes';
+import { defaultLanguage } from '../i18n/config';
+import { localizedPath, pageLanguages, pagePaths, type PageId } from '../i18n/routes';
 
 const pages = Object.keys(pagePaths) as PageId[];
 
@@ -16,9 +16,9 @@ function escapeXml(value: string) {
 export const GET: APIRoute = ({ site }) => {
 	const siteUrl = site ?? new URL('https://realtvsize.com');
 	const urls = pages.flatMap((page) =>
-		languages.map((language) => {
+		pageLanguages(page).map((language) => {
 			const location = new URL(localizedPath(language, page), siteUrl).href;
-			const alternates = languages
+			const alternates = pageLanguages(page)
 				.map((alternateLanguage) => {
 					const href = new URL(localizedPath(alternateLanguage, page), siteUrl).href;
 

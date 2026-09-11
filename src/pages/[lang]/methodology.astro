@@ -1,0 +1,84 @@
+---
+import ContentGuide from '../../components/ContentGuide.astro';
+import RelatedTools from '../../components/RelatedTools.astro';
+import { getTranslation } from '../../i18n/config';
+import Layout from '../../layouts/Layout.astro';
+import { dimensions, format, percentageIncrease, viewingMultipliers, commonTvSizes } from '../../scripts/tv-math';
+
+export function getStaticPaths() { return [{ params: { lang: 'en' } }]; }
+const title = 'TV Size Calculation Methodology & Formulas | RealTVSize';
+const description = 'How RealTVSize calculates 16:9 screen dimensions, area differences, field of view, viewing distance and TV fit, with formulas, assumptions and references.';
+const screen = dimensions(65);
+const increase = percentageIncrease(dimensions(55).area, screen.area);
+const structuredData = {
+	'@context': 'https://schema.org', '@type': 'WebPage',
+	name: title, description, url: 'https://realtvsize.com/en/methodology', inLanguage: 'en',
+	about: { '@type': 'Thing', name: 'TV screen geometry and viewing-distance calculations' },
+};
+---
+<Layout title={title} description={description} lang="en" page="methodology" t={getTranslation('en')} structuredData={structuredData}>
+	<header class="site-shell py-16 sm:py-24">
+		<div class="mx-auto max-w-3xl">
+			<p class="eyebrow">Behind the tools</p>
+			<h1 class="mt-4 text-balance text-4xl font-semibold tracking-[-0.045em] sm:text-6xl">How RealTVSize Calculates TV Sizes</h1>
+			<p class="mt-6 text-lg leading-8 text-[var(--text-secondary)]">The tools use the same screen geometry for comparison, viewing distance and fit. Here are the formulas, units and assumptions that turn your measurements into a result.</p>
+		</div>
+	</header>
+	<ContentGuide heading="Screen dimensions and area" id="screen-geometry">
+		<p>We assume a flat rectangular screen with a 16:9 aspect ratio. Advertised diagonal D refers to the active picture, excluding the bezel and stand. Nominal sizes can differ slightly from the actual panel diagonal; use manufacturer measurements when that difference matters.</p>
+		<h3>16:9 width and height</h3>
+		<p>The width-to-height ratio is 16/9. By the Pythagorean theorem, the diagonal of a rectangle with sides 16 and 9 is √(16² + 9²) = √337. Scaling that rectangle to diagonal D gives:</p>
+		<ul>
+			<li><code>Width W = D × 16 / √337</code></li>
+			<li><code>Height H = D × 9 / √337</code></li>
+			<li><code>Screen area A = W × H = D² × 144 / 337</code></li>
+		</ul>
+		<p>If D is in inches, W and H are in inches and A is in square inches. A 65-inch screen calculates to {format(screen.width)} × {format(screen.height)} inches and {format(screen.area, 0)} square inches, rounded for display. The same formulas work in centimeters if all lengths use centimeters.</p>
+		<h3>Percentage size differences</h3>
+		<p>The <a href="/en/compare">comparison calculator</a> reports absolute diagonal, width, height and area differences by subtracting the smaller measurement from the larger. Its area-increase percentage uses the smaller area as the denominator:</p>
+		<p><code>Area increase (%) = (larger area / smaller area − 1) × 100</code></p>
+		<p>At the same aspect ratio this is also <code>((larger diagonal / smaller diagonal)² − 1) × 100</code>. Going from 55 to 65 inches gives {format(increase)}% more area. The percentage width, height or diagonal increase instead uses the unsquared diagonal ratio. Reversing the tool inputs leaves the reported increase unchanged.</p>
+		<p>“Percent smaller” would answer a different question, using the larger screen as its baseline. For example, a 55-inch screen has about {format((1 - dimensions(55).area / screen.area) * 100)}% less area than a 65-inch screen. Our increase figure does not describe pixel count, picture quality or perceived immersion.</p>
+		<h3>Units, rounding and the illustration</h3>
+		<p>One inch equals 2.54 centimeters; one foot equals 0.3048 meters. Square inches convert to square centimeters by multiplying by 2.54². Calculations retain full precision, with rounding applied to displayed results, so subtracting rounded table entries can produce a slightly different last digit.</p>
+		<p>The comparison drawing gives both screens one relative scale. It resizes with your browser and is not a calibrated life-size display. Its screen dimensions exclude the decorative bezel and any stand drawn in the illustration.</p>
+	</ContentGuide>
+	<ContentGuide heading="Field of view and viewing distance" id="viewing-geometry">
+		<p>Horizontal field of view θ measures the angle subtended by the screen’s width at a viewer centered in front of it. Let L be the perpendicular distance from the viewer’s eyes to the screen plane, using the same units as W.</p>
+		<ul>
+			<li><code>θ = 2 × atan(W / (2 × L))</code></li>
+			<li><code>L = W / (2 × tan(θ / 2))</code></li>
+		</ul>
+		<p>The inverse tangent returns radians; multiply by 180/π to display degrees. When calculating distance from an angle in degrees, convert the angle to radians before using the tangent. Our controls store screen diagonals in inches and distances in feet, converting feet to inches for the angle calculation.</p>
+		<h3>RealTVSize viewing presets</h3>
+		<table>
+			<caption>Distance multipliers for a 16:9 screen; distance and diagonal must use the same unit</caption>
+			<thead><tr><th scope="col">Preset</th><th scope="col">Horizontal angle</th><th scope="col">Distance / diagonal</th></tr></thead>
+			<tbody>{(['immersive', 'balanced', 'relaxed'] as const).map((mode, i) => <tr><th scope="row">{mode[0].toUpperCase() + mode.slice(1)}</th><td>{[40, 30, 25][i]}°</td><td>{format(viewingMultipliers[mode], 3)}×</td></tr>)}</tbody>
+		</table>
+		<p>These presets describe different picture sizes in your view. They are not universal comfort limits or a claim that a standards body certifies your setup. The simulator’s descriptive labels group the calculated angle: distant below 20°, relaxed from 20° to below 27.5°, balanced from 27.5° to below 35°, immersive from 35° to below 45°, and highly immersive at 45° or more.</p>
+		<h3>Finding a diagonal from your room</h3>
+		<p>The <a href="/en/find-my-tv-size">room-based TV size calculator</a> reverses the distance formula. It uses couch-to-screen distance, not floor area or room volume:</p>
+		<p><code>D = 2 × L × tan(θ / 2) × √337 / 16</code></p>
+		<p>It then chooses the nearest diagonal from this common-size list: {commonTvSizes.join(', ')} inches. Equal-distance ties select the smaller listed size. Results outside that list’s range select the nearest endpoint, so the resulting angle may differ substantially from the target. The displayed reasonable range spans the rounded relaxed and immersive results; it is not a statistical confidence interval or a complete retail catalog.</p>
+		<h3>What the preview assumes</h3>
+		<p>The viewing preview scales the picture using its angular width within a fixed reference window. It illustrates relative apparent size, not your complete visual field or a calibrated simulation of eyesight. It assumes a centered viewer and does not model curved screens, off-axis panel quality, mounting tilt or vertical viewing angle. Resolution does not alter these geometric calculations.</p>
+		<p>Use the <a href="/en/viewing-distance">viewing-distance calculator</a> to test nearby positions and sizes. Content, visual acuity, lighting and personal preference can all affect your final choice.</p>
+	</ContentGuide>
+	<ContentGuide heading="Recommendations and external references" id="references">
+		<p><a href="https://www.thx.com/questions/what-size-tv-should-i-buy-for-my-living-room/">THX’s home TV sizing guidance</a> recommends multiplying couch-to-TV distance in inches by 0.835 to obtain a diagonal. Applying our 16:9 geometry to that ratio gives approximately a 40° horizontal field of view. That equivalence is a geometric interpretation of their ratio; our 30° balanced and 25° relaxed settings are additional RealTVSize choices.</p>
+		<p><a href="https://www.sony.com/electronics/support/televisions-projectors-lcd-tvs-android-/xbr-75x850f/articles/00008601">Sony’s minimum viewing-distance guide</a> gives 1.5 times screen height for 4K and three times screen height for HD. This resolution-oriented guidance concerns detail visibility and can place a viewer closer than our angle-based presets. A minimum detail-viewing distance and a comfortable everyday picture size answer different questions.</p>
+		<p>For a separate cinema context, <a href="https://www.thx.com/questions/thx-certified-screen-placement/">THX’s certified screen-placement guidance</a> discusses a 36° horizontal angle for cinema design. We do not present cinema placement criteria as mandatory rules for a home television. These references provide context; RealTVSize’s outputs follow the formulas and presets documented above.</p>
+	</ContentGuide>
+	<ContentGuide heading="Fit calculations and practical limits" id="fit-method">
+		<p>The <a href="/en/will-it-fit">TV dimensions and fit calculator</a> compares the screen estimate, or the exact outer dimensions you enter, with a front-facing rectangular space. It subtracts twice the per-side clearance from available width and, when supplied, height.</p>
+		<ul>
+			<li><code>Usable width = opening width − 2 × clearance</code></li>
+			<li><code>Usable height = opening height − 2 × clearance</code></li>
+			<li>A fit requires TV width and height to be no greater than their corresponding usable dimensions. With height omitted, only width is checked.</li>
+		</ul>
+		<p>Estimated mode finds the largest common screen diagonal that satisfies those limits. Exact mode checks the supplied model dimensions without suggesting a different model. Measurements within 10⁻¹⁰ inches of a boundary are treated as equal to avoid floating-point conversion errors; that is a numerical tolerance, not an installation allowance.</p>
+		<p>Confirm the manufacturer’s dimensions, including the stand when used. Depth, foot spacing, support strength, mounting compatibility, ventilation and cable access are outside the rectangular fit calculation. No screen-area or distance result verifies those requirements.</p>
+	</ContentGuide>
+	<RelatedTools current="methodology" />
+</Layout>

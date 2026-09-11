@@ -6,7 +6,7 @@ const fr = {
 	languageName: 'Français',
 	pageTitles: {
 		willItFit: frTools.fitTitle + ' | RealTVSize',
-		home: 'RealTVSize', compare: 'Comparer les tailles de TV | RealTVSize', viewingDistance: 'Distance de visionnage | RealTVSize', findMyTvSize: 'Trouver ma taille de TV | RealTVSize', about: 'À propos | RealTVSize', contact: 'Nous contacter | RealTVSize', privacyPolicy: 'Politique de confidentialité | RealTVSize', termsAndConditions: 'Conditions générales | RealTVSize',
+		home: 'Calculateur de taille de TV | RealTVSize', compare: 'Comparer les tailles de TV | RealTVSize', viewingDistance: 'Distance de visionnage | RealTVSize', findMyTvSize: 'Trouver ma taille de TV | RealTVSize', about: 'À propos | RealTVSize', contact: 'Nous contacter | RealTVSize', privacyPolicy: 'Politique de confidentialité | RealTVSize', termsAndConditions: 'Conditions générales | RealTVSize',
 	},
 	common: {
 		skipToContent: 'Aller au contenu', degrees: '°', inchSymbol: '″', inchesShort: 'po', feetShort: 'pi', squareInchesShort: 'po²', separator: '·',

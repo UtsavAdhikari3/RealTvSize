@@ -9,9 +9,11 @@ import type { Translation } from '../i18n/types';
 interface Props {
 	t: Translation;
 	primaryHeading?: boolean;
+	heading?: string;
+	intro?: string;
 }
 
-const { t, primaryHeading = false } = Astro.props;
+const { t, primaryHeading = false, heading = t.viewingDistance.heading, intro = t.viewingDistance.intro } = Astro.props;
 const Heading = primaryHeading ? 'h1' : 'h2';
 const clientTranslations = t;
 ---
@@ -21,10 +23,10 @@ const clientTranslations = t;
 		<div class="max-w-3xl">
 			<p class="eyebrow">{t.viewingDistance.eyebrow}</p>
 			<Heading class="mt-4 text-balance text-[clamp(2.3rem,5vw,4.4rem)] font-semibold leading-[1.02] tracking-[-0.055em] text-[var(--text)]">
-				{t.viewingDistance.heading}
+				{heading}
 			</Heading>
 			<p class="mt-5 max-w-2xl text-pretty text-base leading-7 text-[var(--text-secondary)] sm:text-lg">
-				{t.viewingDistance.intro}
+				{intro}
 			</p>
 		</div>
 

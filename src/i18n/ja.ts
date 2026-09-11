@@ -6,7 +6,7 @@ const ja = {
 	languageName: '日本語',
 	pageTitles: {
 		willItFit: jaTools.fitTitle + ' | RealTVSize',
-		home: 'RealTVSize', compare: 'テレビサイズを比較 | RealTVSize', viewingDistance: '視聴距離 | RealTVSize', findMyTvSize: '最適なテレビサイズを探す | RealTVSize', about: '私たちについて | RealTVSize', contact: 'お問い合わせ | RealTVSize', privacyPolicy: 'プライバシーポリシー | RealTVSize', termsAndConditions: '利用規約 | RealTVSize',
+		home: 'テレビサイズ計算ツール | RealTVSize', compare: 'テレビサイズを比較 | RealTVSize', viewingDistance: '視聴距離 | RealTVSize', findMyTvSize: '最適なテレビサイズを探す | RealTVSize', about: '私たちについて | RealTVSize', contact: 'お問い合わせ | RealTVSize', privacyPolicy: 'プライバシーポリシー | RealTVSize', termsAndConditions: '利用規約 | RealTVSize',
 	},
 	common: {
 		skipToContent: '本文へ移動', degrees: '°', inchSymbol: '″', inchesShort: 'インチ', feetShort: 'ft', squareInchesShort: '平方インチ', separator: '·',

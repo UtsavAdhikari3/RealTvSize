@@ -29,6 +29,7 @@ const { lang, t } = Astro.props;
 			<a class="hover:text-[var(--text)]" href={localizedPath(lang, 'findMyTvSize')}>{t.navigation.findMyTvSize}</a>
 			<a class="hover:text-[var(--text)]" href={localizedPath(lang, 'about')}>{t.navigation.about}</a>
 			<a class="hover:text-[var(--text)]" href={localizedPath(lang, 'contact')}>{t.navigation.contact}</a>
+			{lang === 'en' && <a class="hover:text-[var(--text)]" href={localizedPath(lang, 'methodology')}>Methodology</a>}
 			<a class="hover:text-[var(--text)]" href={localizedPath(lang, 'privacyPolicy')}>{t.navigation.privacyPolicy}</a>
 			<a class="hover:text-[var(--text)]" href={localizedPath(lang, 'termsAndConditions')}>{t.navigation.termsAndConditions}</a>
 		</nav>

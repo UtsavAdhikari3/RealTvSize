@@ -2,6 +2,7 @@
 import WillItFit from '../../components/WillItFit.astro';
 import FaqSection from '../../components/FaqSection.astro';
 import SeoContent from '../../components/SeoContent.astro';
+import RelatedTools from '../../components/RelatedTools.astro';
 import TVComparison from '../../components/TVComparison.astro';
 import TVSizeRecommender from '../../components/TVSizeRecommender.astro';
 import ViewingDistanceSimulator from '../../components/ViewingDistanceSimulator.astro';
@@ -21,11 +22,8 @@ interface Props {
 const { lang, t } = Astro.props;
 const isEnglish = lang === 'en';
 const description = isEnglish
-	? 'Free TV size calculator based on room size and viewing distance. Compare screens, preview 4K viewing angles, and find the ideal TV size for your room. Check fit, switch units, and share your setup.'
+	? 'Free TV size calculator. Visualize screen sizes, compare dimensions, explore viewing distance and check whether your next TV fits your space.'
 	: `${t.comparison.intro} ${t.tools.featureText}`;
-const keywords = isEnglish
-	? 'tv size calculator, tv size calculator based on room size, tv size calculator viewing distance, tv size calculator distance, tv size calculator for room, ideal tv size calculator, room tv size calculator, tv size calculator 4k, optimal tv size calculator, distance to tv size calculator'
-	: undefined;
 const structuredData = isEnglish
 	? {
 		'@context': 'https://schema.org',
@@ -77,7 +75,7 @@ const structuredData = isEnglish
 	: undefined;
 ---
 
-<Layout title={t.pageTitles.home} lang={lang} page="home" t={t} description={description} keywords={keywords} structuredData={structuredData}>
+<Layout title={t.pageTitles.home} lang={lang} page="home" t={t} description={description} structuredData={structuredData}>
 	<TVComparison t={t} />
 	<ViewingDistanceSimulator t={t} />
 	<TVSizeRecommender t={t} />
@@ -85,4 +83,5 @@ const structuredData = isEnglish
 	<WhyVisualization t={t} />
 	{isEnglish && <SeoContent />}
 	{isEnglish && <FaqSection />}
+	{isEnglish && <RelatedTools current="home" />}
 </Layout>

@@ -6,7 +6,7 @@ const es = {
 	languageName: 'Español',
 	pageTitles: {
 		willItFit: esTools.fitTitle + ' | RealTVSize',
-		home: 'RealTVSize',
+		home: 'Calculadora de tamaño de TV | RealTVSize',
 		compare: 'Comparar tamaños de TV | RealTVSize',
 		viewingDistance: 'Distancia de visualización | RealTVSize',
 		findMyTvSize: 'Encuentra el tamaño de tu TV | RealTVSize',

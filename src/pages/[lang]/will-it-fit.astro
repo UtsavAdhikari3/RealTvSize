@@ -1,5 +1,8 @@
 ---
 import WillItFit from '../../components/WillItFit.astro';
+import ToolGuide from '../../components/ToolGuide.astro';
+import RelatedTools from '../../components/RelatedTools.astro';
+import { toolSeo, calculatorSchema } from '../../data/tool-seo';
 import { getLanguageStaticPaths, type Language } from '../../i18n/config';
 import type { Translation } from '../../i18n/types';
 import Layout from '../../layouts/Layout.astro';
@@ -7,6 +10,7 @@ export const getStaticPaths = getLanguageStaticPaths;
 interface Props { lang: Language; t: Translation }
 const { lang, t } = Astro.props;
 ---
-<Layout title={t.pageTitles.willItFit} lang={lang} page="willItFit" t={t} description={t.tools.fitIntro}>
-	<WillItFit t={t} primaryHeading />
+<Layout title={t.pageTitles.willItFit} lang={lang} page="willItFit" t={t} description={lang === 'en' ? toolSeo.willItFit.description : t.tools.fitIntro} structuredData={lang === 'en' ? calculatorSchema(toolSeo.willItFit.heading, toolSeo.willItFit.description, '/en/will-it-fit') : undefined}>
+	<WillItFit t={t} primaryHeading heading={lang === 'en' ? toolSeo.willItFit.heading : undefined} />
+	{lang === 'en' && <><ToolGuide tool="willItFit" /><RelatedTools current="willItFit" /></>}
 </Layout>

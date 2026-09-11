@@ -1,0 +1,26 @@
+---
+interface Props { heading: string; id: string }
+const { heading, id } = Astro.props;
+---
+<section class="content-guide border-t border-[var(--line)] bg-[var(--surface)] py-20 sm:py-28" aria-labelledby={id}>
+	<div class="site-shell">
+		<div class="mx-auto max-w-3xl">
+			<h2 id={id} class="text-balance text-3xl font-semibold tracking-[-0.045em] sm:text-4xl">{heading}</h2>
+			<div class="guide-body mt-8"><slot /></div>
+		</div>
+	</div>
+</section>
+
+<style>
+	.guide-body { color: var(--text-secondary); line-height: 1.75; overflow-wrap: anywhere; }
+	.guide-body :global(p + p) { margin-top: 1rem; }
+	.guide-body :global(h3) { margin-top: 2rem; margin-bottom: 1rem; color: var(--text); font-size: 1.25rem; font-weight: 600; letter-spacing: -0.025em; }
+	.guide-body :global(a) { color: var(--color-accent); text-decoration: underline; text-underline-offset: 4px; }
+	.guide-body :global(ul) { padding-left: 1.25rem; list-style: disc; }
+	.guide-body :global(li + li) { margin-top: .5rem; }
+	.guide-body :global(table) { width: 100%; margin-block: 1.5rem; border-collapse: collapse; font-size: .875rem; }
+	.guide-body :global(caption) { text-align: left; margin-bottom: .75rem; }
+	.guide-body :global(th), .guide-body :global(td) { padding: .75rem .5rem; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+	.guide-body :global(th) { color: var(--text); font-weight: 600; }
+	.guide-body :global(code) { font-size: .875em; color: var(--text); }
+</style>

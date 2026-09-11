@@ -16,6 +16,11 @@ export function dimensions(diagonal: number) {
 	return { diagonal, width, height, area: width * height };
 }
 
+/** Increase from the smaller value to the larger, using the smaller as baseline. */
+export function percentageIncrease(a: number, b: number) {
+	return (Math.max(a, b) / Math.min(a, b) - 1) * 100;
+}
+
 export function viewingDistance(diagonal: number, mode: keyof typeof viewingMultipliers) {
 	return (diagonal * viewingMultipliers[mode]) / 12;
 }

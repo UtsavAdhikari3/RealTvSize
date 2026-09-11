@@ -4,6 +4,7 @@ import es from './es';
 import fr from './fr';
 import ja from './ja';
 import type { Translation } from './types';
+import { languageCodes } from './languages';
 
 export const languageConfig = {
 	en: { label: en.languageName, translation: en },
@@ -15,7 +16,7 @@ export const languageConfig = {
 
 export type Language = keyof typeof languageConfig;
 
-export const languages = Object.keys(languageConfig) as Language[];
+export const languages: Language[] = [...languageCodes];
 export const defaultLanguage: Language = 'en';
 
 export function isLanguage(value: string | undefined): value is Language {

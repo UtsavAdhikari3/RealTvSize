@@ -1,5 +1,8 @@
 ---
 import TVSizeRecommender from '../../components/TVSizeRecommender.astro';
+import ToolGuide from '../../components/ToolGuide.astro';
+import RelatedTools from '../../components/RelatedTools.astro';
+import { toolSeo, calculatorSchema } from '../../data/tool-seo';
 import { getLanguageStaticPaths, type Language } from '../../i18n/config';
 import type { Translation } from '../../i18n/types';
 import Layout from '../../layouts/Layout.astro';
@@ -14,6 +17,7 @@ interface Props {
 const { lang, t } = Astro.props;
 ---
 
-<Layout title={t.pageTitles.findMyTvSize} lang={lang} page="findMyTvSize" t={t}>
-	<TVSizeRecommender t={t} primaryHeading />
+<Layout title={t.pageTitles.findMyTvSize} lang={lang} page="findMyTvSize" t={t} description={lang === 'en' ? toolSeo.findMyTvSize.description : undefined} structuredData={lang === 'en' ? calculatorSchema(toolSeo.findMyTvSize.heading, toolSeo.findMyTvSize.description, '/en/find-my-tv-size') : undefined}>
+	<TVSizeRecommender t={t} primaryHeading heading={lang === 'en' ? toolSeo.findMyTvSize.heading : undefined} />
+	{lang === 'en' && <><ToolGuide tool="findMyTvSize" /><RelatedTools current="findMyTvSize" /></>}
 </Layout>

@@ -9,9 +9,10 @@ import type { Translation } from '../i18n/types';
 interface Props {
 	t: Translation;
 	primaryHeading?: boolean;
+	heading?: string;
 }
 
-const { t, primaryHeading = false } = Astro.props;
+const { t, primaryHeading = false, heading = t.recommender.heading } = Astro.props;
 const Heading = primaryHeading ? 'h1' : 'h2';
 const clientTranslations = t;
 ---
@@ -21,7 +22,7 @@ const clientTranslations = t;
 		<div class="max-w-3xl">
 			<p class="eyebrow">{t.recommender.eyebrow}</p>
 			<Heading class="mt-4 text-balance text-[clamp(2.3rem,5vw,4.4rem)] font-semibold leading-[1.02] tracking-[-0.055em] text-[var(--text)]">
-				{t.recommender.heading}
+				{heading}
 			</Heading>
 			<p class="mt-5 max-w-2xl text-pretty text-base leading-7 text-[var(--text-secondary)] sm:text-lg">
 				{t.recommender.intro}
@@ -89,7 +90,7 @@ const clientTranslations = t;
 		<ResultCard label={t.profiles.balanced.label} value={`65 ${t.common.inchesShort}`} id="balanced-size-result" note={t.recommender.fieldOfView30} />
 		<ResultCard label={t.profiles.relaxed.label} value={`55 ${t.common.inchesShort}`} id="relaxed-size-result" note={t.recommender.fieldOfView25} />
 	</div>
-	<div class="cross-tool-links"><a data-fit-link href="will-it-fit?fit-size=65">{t.tools.checkFit}</a></div>
+	<div class="cross-tool-links"><a data-fit-link href={`/${Astro.params.lang ?? 'en'}/will-it-fit?fit-size=65`}>{t.tools.checkFit}</a></div>
     <p id="recommendation-live" class="sr-only" aria-live="polite"></p>
 </section>
 

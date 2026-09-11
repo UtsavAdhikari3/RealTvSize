@@ -1,5 +1,8 @@
 ---
 import ViewingDistanceSimulator from '../../components/ViewingDistanceSimulator.astro';
+import ToolGuide from '../../components/ToolGuide.astro';
+import RelatedTools from '../../components/RelatedTools.astro';
+import { toolSeo, calculatorSchema } from '../../data/tool-seo';
 import { getLanguageStaticPaths, type Language } from '../../i18n/config';
 import type { Translation } from '../../i18n/types';
 import Layout from '../../layouts/Layout.astro';
@@ -14,6 +17,7 @@ interface Props {
 const { lang, t } = Astro.props;
 ---
 
-<Layout title={t.pageTitles.viewingDistance} lang={lang} page="viewingDistance" t={t}>
-	<ViewingDistanceSimulator t={t} primaryHeading />
+<Layout title={t.pageTitles.viewingDistance} lang={lang} page="viewingDistance" t={t} description={lang === 'en' ? toolSeo.viewingDistance.description : undefined} structuredData={lang === 'en' ? calculatorSchema(toolSeo.viewingDistance.heading, toolSeo.viewingDistance.description, '/en/viewing-distance') : undefined}>
+	<ViewingDistanceSimulator t={t} primaryHeading heading={lang === 'en' ? toolSeo.viewingDistance.heading : undefined} intro={lang === 'en' ? `Move the couch. Feel the difference. ${t.viewingDistance.intro}` : undefined} />
+	{lang === 'en' && <><ToolGuide tool="viewingDistance" /><RelatedTools current="viewingDistance" /></>}
 </Layout>

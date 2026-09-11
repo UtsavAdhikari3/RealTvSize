@@ -1,0 +1,30 @@
+---
+import { comparisons } from '../data/comparisons';
+import type { PageId } from '../i18n/routes';
+interface Props { current?: PageId }
+const { current } = Astro.props;
+const tools = [
+	{ page: 'home', path: '/en', label: 'TV size calculator' },
+	{ page: 'compare', path: '/en/compare', label: 'TV size comparison tool' },
+	{ page: 'viewingDistance', path: '/en/viewing-distance', label: 'TV viewing distance calculator' },
+	{ page: 'findMyTvSize', path: '/en/find-my-tv-size', label: 'Find a TV size for your room' },
+	{ page: 'willItFit', path: '/en/will-it-fit', label: 'Check TV dimensions and fit' },
+	{ page: 'methodology', path: '/en/methodology', label: 'Calculation methodology' },
+];
+---
+<aside class="site-shell py-12 sm:py-16">
+	<div class="mx-auto grid max-w-3xl gap-8 sm:grid-cols-2">
+		<nav aria-label="Related TV tools">
+			<h2 class="text-lg font-semibold tracking-[-0.025em]">Plan your setup</h2>
+			<ul class="mt-4 space-y-3 text-sm text-[var(--text-secondary)]">
+				{tools.filter((tool) => tool.page !== current).map((tool) => <li><a class="underline underline-offset-4 hover:text-[var(--text)]" href={tool.path}>{tool.label}</a></li>)}
+			</ul>
+		</nav>
+		<nav aria-label="Popular TV size comparisons">
+			<h2 class="text-lg font-semibold tracking-[-0.025em]">Popular comparisons</h2>
+			<ul class="mt-4 space-y-3 text-sm text-[var(--text-secondary)]">
+				{comparisons.filter((pair) => pair.slug !== current).map((pair) => <li><a class="underline underline-offset-4 hover:text-[var(--text)]" href={`/en/compare/${pair.slug}`}>{pair.a} vs {pair.b} inch TV</a></li>)}
+			</ul>
+		</nav>
+	</div>
+</aside>

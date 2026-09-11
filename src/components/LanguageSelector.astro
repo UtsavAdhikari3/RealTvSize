@@ -1,6 +1,6 @@
 ---
 import { languageConfig, type Language } from '../i18n/config';
-import { localizedPath, type PageId } from '../i18n/routes';
+import { localizedPath, pageLanguages, type PageId } from '../i18n/routes';
 import type { Translation } from '../i18n/types';
 
 interface Props {
@@ -19,8 +19,8 @@ const { lang, page, t } = Astro.props;
 		aria-label={t.navigation.language}
 		class="h-9 w-full cursor-pointer appearance-none rounded-lg border border-transparent bg-transparent py-0 pl-2.5 pr-7 text-xs font-medium text-[var(--text-secondary)] transition-colors hover:border-[var(--line)] hover:bg-[var(--surface)] hover:text-[var(--text)] sm:w-auto"
 	>
-		{Object.entries(languageConfig).map(([code, config]) => (
-			<option value={localizedPath(code as Language, page)} selected={code === lang}>{config.label}</option>
+		{pageLanguages(page).map((code) => (
+			<option value={localizedPath(code, page)} selected={code === lang}>{languageConfig[code].label}</option>
 		))}
 	</select>
 	<svg class="pointer-events-none absolute right-2.5 top-1/2 size-3 -translate-y-1/2 text-[var(--text-tertiary)]" aria-hidden="true" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5">

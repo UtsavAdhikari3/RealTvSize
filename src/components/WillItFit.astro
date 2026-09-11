@@ -2,8 +2,8 @@
 import CalculatorToolbar from './CalculatorToolbar.astro';
 import RangeControl from './RangeControl.astro';
 import type { Translation } from '../i18n/types';
-interface Props { t: Translation; primaryHeading?: boolean }
-const { t, primaryHeading = false } = Astro.props;
+interface Props { t: Translation; primaryHeading?: boolean; heading?: string }
+const { t, primaryHeading = false, heading = t.tools.fitTitle } = Astro.props;
 const Heading = primaryHeading ? 'h1' : 'h2';
 const fields = [
 	{ key: 'width', label: t.tools.width },
@@ -13,7 +13,7 @@ const fields = [
 ---
 <section id="will-it-fit" class="site-shell section-anchor fit-section" data-fit data-i18n={JSON.stringify(t)}>
 	<p class="eyebrow">{t.tools.checkFit}</p>
-	<Heading>{t.tools.fitTitle}</Heading>
+	<Heading>{heading}</Heading>
 	<p class="fit-intro">{t.tools.fitIntro}</p>
 	<CalculatorToolbar t={t} id="fit" />
 	<div class="fit-layout">

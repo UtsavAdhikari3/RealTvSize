@@ -1,0 +1,56 @@
+---
+import ContentGuide from './ContentGuide.astro';
+import { dimensions, format, viewingDistance } from '../scripts/tv-math';
+interface Props { tool: 'compare' | 'viewingDistance' | 'findMyTvSize' | 'willItFit' }
+const { tool } = Astro.props;
+---
+{tool === 'compare' && <ContentGuide heading="How to compare TV sizes" id="comparison-guide">
+	<p>Choose two diagonal sizes to see their screens drawn at the same relative scale. Side-by-side mode makes the outlines easy to read; overlay mode reveals the added picture around the smaller screen. Center alignment keeps the middle fixed, while bottom alignment helps compare screens resting at the same level. The illustration scales to your device, so it is a proportional comparison, not a life-size ruler.</p>
+	<h3>Diagonal size versus width and height</h3>
+	<p>A TV’s advertised size measures the picture from one corner to the opposite corner. It is not the width of the television. For the 16:9 screens used here, width is about 87.2% of the diagonal and height is about 49.0%. A 65-inch picture is therefore approximately 56.7 inches wide and 31.9 inches tall.</p>
+	<p>These measurements describe the active screen. Bezels, a stand, feet and mounting hardware can change the outer dimensions. Use the <a href="/en/will-it-fit">TV dimensions and fit calculator</a> with the manufacturer’s exact measurements when checking a cabinet or wall recess. Allow for the clearance specified for the actual model.</p>
+	<h3>Why screen area grows faster than the diagonal</h3>
+	<p>Width and height both increase when the diagonal grows, so picture area increases with the square of the size. A 65-inch screen has about 40% more area than a 55-inch screen, although its diagonal is only about 18% larger. This is why a ten-inch upgrade can feel more substantial than its name suggests.</p>
+	<p>The tool’s area-increase percentage always compares the larger screen against the smaller one, whichever order you choose. Swapping the inputs does not change that percentage. Area describes picture space, not resolution or image quality: two 4K televisions can have the same pixel count and very different physical sizes.</p>
+	<h3>Popular comparisons and your next step</h3>
+	<p>Start with <a href="/en/compare/55-vs-65">55 vs 65 inches</a> for a typical one-step upgrade, or <a href="/en/compare/65-vs-75">65 vs 75 inches</a> when you want more picture from the same couch. <a href="/en/compare/75-vs-85">75 vs 85 inches</a> focuses on larger installations. The bigger jumps, <a href="/en/compare/55-vs-75">55 vs 75</a> and <a href="/en/compare/65-vs-85">65 vs 85</a>, make the area difference especially clear.</p>
+	<p>Once you narrow the choice, enter your actual seat position in the <a href="/en/viewing-distance">viewing-distance calculator</a>. If you have no size in mind, <a href="/en/find-my-tv-size">find a TV size from your room’s seating distance</a> first. The <a href="/en/methodology">methodology</a> explains the geometry and assumptions behind every result.</p>
+</ContentGuide>}
+{tool === 'viewingDistance' && <ContentGuide heading="How far should you sit from a TV?" id="distance-guide">
+	<p>Measure from your eyes in your normal seat to the screen, then enter that distance and your TV’s diagonal. Moving the seat closer or choosing a larger screen increases how much of your view the picture occupies. The preview lets you compare these changes before rearranging furniture.</p>
+	<h3>Field of view makes distance meaningful</h3>
+	<p>Horizontal field of view is the angle between the left and right edges of the screen, measured at your eye position. RealTVSize uses three reference angles: 40° for immersive viewing, 30° for balanced viewing, and 25° for relaxed viewing. They are starting points for preference, not pass-or-fail limits. The preview assumes you sit centered in front of a flat screen.</p>
+	<table>
+		<caption>Calculated distances for a 65-inch 16:9 screen</caption>
+		<thead><tr><th scope="col">Viewing style</th><th scope="col">Angle</th><th scope="col">Distance</th></tr></thead>
+		<tbody>{(['immersive', 'balanced', 'relaxed'] as const).map((mode, i) => <tr><th scope="row">{mode[0].toUpperCase() + mode.slice(1)}</th><td>{[40, 30, 25][i]}°</td><td>{format(viewingDistance(65, mode))} ft / {format(viewingDistance(65, mode) * .3048, 2)} m</td></tr>)}</tbody>
+	</table>
+	<h3>Resolution and comfort answer different questions</h3>
+	<p>A higher-resolution screen can show finer detail at close range when the source contains that detail. It does not change the geometric viewing angle. This calculator has no resolution input: the same physical screen and seat produce the same field of view whether the panel is 1080p, 4K or 8K.</p>
+	<p><a href="https://www.sony.com/electronics/support/televisions-projectors-lcd-tvs-android-/xbr-75x850f/articles/00008601">Sony’s minimum-distance guidance</a> gives 1.5 screen heights for 4K and three screen heights for HD. Those resolution-based distances address visible detail; they do not necessarily match your preferred picture size. Low-quality streams, eyesight, subtitles and fast camera movement can all influence where you prefer to sit.</p>
+	<h3>Use recommendations as a starting point</h3>
+	<p><a href="https://www.thx.com/questions/what-size-tv-should-i-buy-for-my-living-room/">THX’s home TV sizing guide</a> suggests multiplying seating distance in inches by 0.835 to find a screen diagonal. For 16:9 geometry, that works out to approximately a 40° horizontal view. Our 30° and 25° options offer progressively smaller pictures at the same distance; they are RealTVSize presets.</p>
+	<p>Try the nearest and farthest regularly used seats. Choose a position that keeps the picture comfortable for your usual content, then check the screen’s physical placement. Use <a href="/en/find-my-tv-size">the room-based size calculator</a> if your couch position is fixed, or read the <a href="/en/methodology">formulas and assumptions</a> behind the guide.</p>
+</ContentGuide>}
+{tool === 'findMyTvSize' && <ContentGuide heading="Choose a TV size for your room" id="room-size-guide">
+	<p>A useful TV size calculator based on room size starts with the part of the room you actually watch from. Measure the distance from your seated eyes to the planned screen surface. Floor area alone cannot give that distance: two rooms with the same square footage can put the couch very different distances from the TV.</p>
+	<h3>Start with viewing distance, then choose a style</h3>
+	<p>Enter your couch distance and choose immersive, balanced or relaxed viewing. The calculator converts that distance into a diagonal using a 40°, 30° or 25° horizontal viewing angle, then selects the nearest size from its list of common TVs. The reasonable range spans the relaxed and immersive recommendations; it is a range of preferences, not a guarantee of comfort.</p>
+	<p>If you are asking “what size TV should I get?” with no other starting point, try balanced first. Compare the immersive option for a larger movie or gaming image and the relaxed option for a smaller picture. Nearest-size rounding means the actual angle may differ slightly from the preset target. At very long or short distances, the available size list can also limit the result.</p>
+	<h3>Room layout still matters</h3>
+	<p>Keep the seating measurement separate from wall-to-wall room depth. A TV stand, the depth of the couch, a walkway behind it and a wall mount all affect where the screen and your eyes end up. If several people share the room, check more than one seat in the <a href="/en/viewing-distance">viewing-distance calculator</a>. Its centered preview does not model viewing from the side.</p>
+	<p>Once you have a suggested size, <a href="/en/compare">compare the nearby diagonals to scale</a>. Then use the <a href="/en/will-it-fit">dimensions and fit calculator</a> to check the space available. A recommended diagonal is only useful if the actual television, stand and required clearances fit the installation.</p>
+	<h3>Use the result to build a shortlist</h3>
+	<p>The calculator selects TV size by viewing distance and your chosen angle; it does not evaluate brightness, contrast, resolution, price or a particular model. Your usual content and lighting may make those qualities just as valuable as extra inches. Read the <a href="/en/methodology">methodology</a> for the inverse field-of-view formula and rounding rules.</p>
+</ContentGuide>}
+{tool === 'willItFit' && <ContentGuide heading="Measure TV dimensions before you buy" id="dimensions-guide">
+	<p>The size printed on a television’s box is its screen diagonal. Use this TV dimensions calculator to estimate a 16:9 screen’s width and height, then compare those dimensions with your available space. For a final fit check, switch to exact dimensions and enter the manufacturer’s measurements for the configuration you plan to use.</p>
+	<h3>From diagonal to TV width</h3>
+	<p>For a 16:9 screen, width is the diagonal multiplied by about 0.872, and height is the diagonal multiplied by about 0.490. As a TV width calculator, this gives a {format(dimensions(65).width)}-inch-wide picture for a 65-inch TV. It does not include the bezel. Two televisions with the same screen diagonal can have different cabinet dimensions and stand heights.</p>
+	<h3>Will my TV fit the opening?</h3>
+	<p>Enter the available width and, when relevant, the available height. The clearance value is applied to each side, so one inch of clearance removes two inches from usable width and two from usable height. If you leave height blank, the result checks width only. Measure the narrowest part of a recess and allow for any trim or projecting shelf.</p>
+	<p>Estimated mode can suggest the largest screen from the tool’s common-size list that fits those front-facing limits. Exact mode checks only the dimensions you supply, because the outside dimensions of another model cannot be inferred from its diagonal. Use dimensions including the stand when the TV will sit on furniture.</p>
+	<h3>Check the rest of the installation</h3>
+	<p>This is a front-facing width and height check. Cabinet depth, foot spacing, weight capacity, mounting hardware, cable access and ventilation need separate checks against the model’s specifications. A screen that fits the rectangle may still need a deeper stand or more space behind it.</p>
+	<p>After confirming the space, <a href="/en/compare">compare screen sizes</a> and <a href="/en/find-my-tv-size">check the size against your seating distance</a>. The <a href="/en/methodology">methodology page</a> explains how the screen estimates and clearance calculation work.</p>
+</ContentGuide>}

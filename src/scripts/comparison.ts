@@ -1,17 +1,19 @@
-import { dimensions, format } from './tv-math';
+import { dimensions, format, percentageIncrease } from './tv-math';
 import { parseStates } from './calculator-state';
 import { area, bindRange, fitLink, length, setupCalculator, text } from './calculator-dom';
 import { interpolate } from '../i18n/types';
 
 const root = document.querySelector<HTMLElement>('[data-comparison]');
 if (root) {
-	const state = parseStates(new URLSearchParams(location.search)).compare;
+	const state = parseStates(new URLSearchParams(location.search), {
+		a: Number(root.dataset.initialA), b: Number(root.dataset.initialB),
+	}).compare;
 	const { t, update, refreshers } = setupCalculator(root, 'compare', state, render);
 	refreshers.push(bindRange(root, 'tv-a-input', 'diagonal', () => state.a, (n) => state.a = n, update, t.tools.invalid));
 	refreshers.push(bindRange(root, 'tv-b-input', 'diagonal', () => state.b, (n) => state.b = n, update, t.tools.invalid));
 	function render() {
 		const a = dimensions(state.a), b = dimensions(state.b), max = Math.max(state.a, state.b);
-		const increase = (Math.max(a.area, b.area) / Math.min(a.area, b.area) - 1) * 100;
+		const increase = percentageIncrease(a.area, b.area);
 		root!.querySelector<HTMLElement>('.comparison-stage')!.hidden = state.view === 'overlay';
 		root!.querySelector<HTMLElement>('[data-overlay-stage]')!.hidden = state.view !== 'overlay';
 		root!.querySelector<HTMLElement>('[data-alignment]')!.hidden = state.view !== 'overlay';

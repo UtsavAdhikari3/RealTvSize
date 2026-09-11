@@ -2,8 +2,8 @@
 import '../styles/global.css';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
-import { defaultLanguage, languages, type Language } from '../i18n/config';
-import { canonicalUrlForRoute, localizedPath, type PageId } from '../i18n/routes';
+import { defaultLanguage, type Language } from '../i18n/config';
+import { canonicalUrlForRoute, localizedPath, pageLanguages, type PageId } from '../i18n/routes';
 import type { Translation } from '../i18n/types';
 
 interface Props {
@@ -38,6 +38,7 @@ const {
 
 const siteUrl = Astro.site ?? new URL('https://realtvsize.com');
 const canonicalUrl = canonicalUrlForRoute(Astro.url, siteUrl);
+const languages = pageLanguages(page);
 const imageUrl = new URL(image, siteUrl);
 const ogLocales: Record<Language, string> = {
 	en: 'en_US',
