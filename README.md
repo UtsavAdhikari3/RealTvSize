@@ -15,6 +15,7 @@ rtk npm run check
 rtk npm test
 rtk npm run test:browser
 rtk npm run build
+rtk npm run audit:seo
 rtk npm run astro -- dev stop
 ```
 
@@ -39,11 +40,30 @@ Every setup includes `units`. Empty fit lengths serialize as empty strings. Inva
 
 The fit calculator checks width and optional height, subtracting clearance on both sides of each checked axis. Screen estimates exclude bezel and stand; exact mode uses supplied manufacturer dimensions and makes no recommendation for other models. Depth, stand footprint, and ventilation requirements must be checked separately.
 
-## First-release verification
+## Localized size guides and comparisons
 
-- 15 automated calculation/state tests cover conversions, fit boundaries, clearance, overflow, width-only checks, malformed links, legacy links, and complete URL round trips.
-- 22 Chromium browser tests cover unit synchronization and persistence, precision across repeated conversions, typed values and keyboard controls, overlay scale/alignment and equal sizes, exact fit, cross-tool links, clipboard success/failure, restoration with conflicting preferences, denied storage, and translated navigation.
-- All four calculators pass automated accessibility checks at 360px in five languages and both themes, with reduced motion enabled. Desktop layouts were also inspected. Browser checks do not substitute for a manual screen-reader or Safari/Firefox audit.
-- Astro type checking and the production build pass. The build emits 47 pages, including all five fit routes, with localized canonical URLs, language alternatives, and sitemap entries.
+The shared inventory in `src/data/catalog.ts` publishes 16 size guides and 12 comparison guides per language. Size hubs live at `/[lang]/tv-sizes`; the existing `/[lang]/compare` calculator is the comparison hub. The route helpers and custom `/sitemap.xml` use this inventory. There are 191 canonical URLs; error pages, redirects, query variants and unsupported sizes/pairs are excluded. Methodology remains English-only.
 
-The storage-denial test excludes Astro’s development toolbar script, which requires storage and is absent from production. Application storage access remains covered.
+Editorial copy lives in typed, render-only `src/data/seo/{en,es,de,fr,ja}.ts` modules. Each entry has distinct placement or upgrade guidance. Calculated values are interpolated through the shared math and locale formatting helpers. The copy is not serialized into calculator client translations. To add a published size or comparison, update the explicit catalog and every locale, then run the content and built-HTML audits.
+
+Size guides initialize the viewing simulator with the page diagonal and the full-precision 30-degree distance. Valid query settings take precedence; invalid fields independently fall back to page defaults. The standalone simulator keeps its 75-inch / 9.4-foot defaults. Reference tables and their fit links stay tied to the URL's sizes when calculator controls change. Shared setup links still target the dedicated calculator routes.
+
+## Verification
+
+- 39 unit tests cover calculations, conversions, fit boundaries, query parsing, route inventory, all five editorial modules and size-page defaults.
+- 51 Chromium tests cover existing calculator behavior, presets, query overrides, reloads, language and unit changes, static references, fit links, unsupported routes and metadata.
+- All 140 detail pages are checked with JavaScript disabled. Representative size, comparison and hub pages pass accessibility and overflow checks at 360px and 1280px in all five languages. Existing calculator checks cover both themes.
+- `npm run audit:seo` audits built HTML for all 191 canonical URLs, unique metadata within each locale, one H1, canonical and reciprocal alternate links, English x-default, visible FAQ/schema parity, collection lists, crawlable internal links, homepage reachability and robots configuration. It writes `artifacts/seo-audit.json`.
+- The browser suite was also run against the production build served by local Wrangler, exercising the deployment worker and asset handling. Set `PLAYWRIGHT_BASE_URL` to test a server other than the default development URL.
+
+Production verification example in PowerShell:
+
+```powershell
+rtk npm run build
+rtk npx.cmd wrangler dev --local --port 4322
+# In a second terminal:
+$env:PLAYWRIGHT_BASE_URL = 'http://127.0.0.1:4322'
+rtk npm run test:browser
+```
+
+Screenshots and traces are in `test-results/`. Browser checks do not substitute for a manual screen-reader or Safari/Firefox audit. The storage-denial test excludes Astro's development toolbar script, which is absent from production. Deployment remains a separate operation.

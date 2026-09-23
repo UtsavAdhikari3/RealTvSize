@@ -23,10 +23,10 @@ function choice<T extends string>(params: URLSearchParams, key: string, choices:
 	const value = params.get(key) as T;
 	return choices.includes(value) ? value : fallback;
 }
-export function parseStates(params: URLSearchParams, comparisonDefaults = { a: 65, b: 85 }): CalculatorStates {
+export function parseStates(params: URLSearchParams, comparisonDefaults = { a: 65, b: 85 }, distanceDefaults: DistanceState = { screen: 75, viewing: 9.4 }): CalculatorStates {
 	return {
 		compare: { a: number(params, 'a', comparisonDefaults.a, 32, 115, true)!, b: number(params, 'b', comparisonDefaults.b, 32, 115, true)!, view: choice(params, 'view', ['side', 'overlay'], 'side'), align: choice(params, 'align', ['center', 'bottom'], 'center') },
-		viewingDistance: { screen: number(params, 'screen', 75, 32, 115, true)!, viewing: number(params, 'viewing', 9.4, 3, 18)! },
+		viewingDistance: { screen: number(params, 'screen', distanceDefaults.screen, 32, 115, true)!, viewing: number(params, 'viewing', distanceDefaults.viewing, 3, 18)! },
 		findMyTvSize: { room: number(params, 'room', 9, 4, 18)!, style: choice(params, 'style', ['immersive', 'balanced', 'relaxed'], 'balanced') },
 		willItFit: { mode: choice(params, 'fit-mode', ['estimate', 'exact'], 'estimate'), diagonal: number(params, 'fit-size', 65, 32, 115, true)!, width: number(params, 'fit-width', null, Number.MIN_VALUE), height: number(params, 'fit-height', null, Number.MIN_VALUE), clearance: number(params, 'fit-clearance', 0, 0)!, tvWidth: number(params, 'fit-tv-width', null, Number.MIN_VALUE), tvHeight: number(params, 'fit-tv-height', null, Number.MIN_VALUE) },
 	};

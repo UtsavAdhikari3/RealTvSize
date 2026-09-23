@@ -1,58 +1,31 @@
 ---
-import TVComparison from '../../../components/TVComparison.astro';
-import ContentGuide from '../../../components/ContentGuide.astro';
-import RelatedTools from '../../../components/RelatedTools.astro';
-import { comparisons, type Comparison } from '../../../data/comparisons';
-import { getTranslation } from '../../../i18n/config';
 import Layout from '../../../layouts/Layout.astro';
-import { dimensions, format, inchesToCm, squareInchesToCm, percentageIncrease, viewingDistance } from '../../../scripts/tv-math';
-
+import TVComparison from '../../../components/TVComparison.astro';
+import SeoReference from '../../../components/SeoReference.astro';
+import SeoBreadcrumbs from '../../../components/SeoBreadcrumbs.astro';
+import FaqSection from '../../../components/FaqSection.astro';
+import CatalogDiscovery from '../../../components/CatalogDiscovery.astro';
+import RelatedTools from '../../../components/RelatedTools.astro';
+import { comparisons, type Comparison } from '../../../data/catalog';
+import { getLanguageStaticPaths, type Language } from '../../../i18n/config';
+import type { Translation } from '../../../i18n/types';
+import { getSeoCopy, pairContent, detailSchema, type Crumb } from '../../../data/seo';
 export function getStaticPaths() {
-	return comparisons.map((comparison) => ({ params: { lang: 'en', pair: comparison.slug }, props: { comparison } }));
+ return getLanguageStaticPaths().flatMap(({ params, props }) => comparisons.map(comparison => ({
+  params: { ...params, pair: comparison.slug }, props: { ...props, comparison },
+ })));
 }
-interface Props { comparison: Comparison }
-const { comparison } = Astro.props;
-const { a: sizeA, b: sizeB, slug, title, heading, description, intro, sections } = comparison;
-const a = dimensions(sizeA), b = dimensions(sizeB);
-const linearIncrease = percentageIncrease(sizeA, sizeB);
-const areaIncrease = percentageIncrease(a.area, b.area);
-const length = (n: number) => `${format(n)} in / ${format(inchesToCm(n))} cm`;
-const area = (n: number) => `${format(n, 0)} in² / ${format(squareInchesToCm(n), 0)} cm²`;
-const url = `https://realtvsize.com/en/compare/${slug}`;
-const structuredData = {
-	'@context': 'https://schema.org', '@type': 'BreadcrumbList',
-	itemListElement: [
-		{ '@type': 'ListItem', position: 1, name: 'TV size calculator', item: 'https://realtvsize.com/en' },
-		{ '@type': 'ListItem', position: 2, name: 'TV size comparison tool', item: 'https://realtvsize.com/en/compare' },
-		{ '@type': 'ListItem', position: 3, name: heading, item: url },
-	],
-};
+interface Props { lang: Language; t: Translation; comparison: Comparison }
+const { lang, t, comparison } = Astro.props;
+const copy = await getSeoCopy(lang), content = pairContent(copy, comparison, lang), page = comparison.slug;
+const crumbs: Crumb[] = [{ name: t.navigation.home, page: 'home' }, { name: copy.labels.comparisons, page: 'compare' }, { name: content.heading, page }];
+const structuredData = detailSchema(Astro.site!, lang, page, content, crumbs);
 ---
-<Layout title={title} description={description} lang="en" page={slug} t={getTranslation('en')} structuredData={structuredData}>
-	<nav class="site-shell pt-6 text-sm text-[var(--text-secondary)]" aria-label="Breadcrumb">
-		<ol class="flex flex-wrap gap-2">
-			<li><a class="underline underline-offset-4" href="/en">TV size calculator</a><span aria-hidden="true"> / </span></li>
-			<li><a class="underline underline-offset-4" href="/en/compare">Compare</a><span aria-hidden="true"> / </span></li>
-			<li aria-current="page">{sizeA} vs {sizeB} inches</li>
-		</ol>
-	</nav>
-	<TVComparison t={getTranslation('en')} heading={heading} intro={intro} initialA={sizeA} initialB={sizeB} />
-	<ContentGuide heading={`${sizeA} vs ${sizeB}: dimensions and screen area`} id="pair-dimensions">
-		<p>The {sizeB}-inch screen is {format(linearIncrease)}% wider and taller, with {format(areaIncrease)}% more screen area than the {sizeA}-inch screen. Both are modeled as flat 16:9 displays.</p>
-		<table>
-			<caption>Fixed reference for {sizeA} and {sizeB} inches, excluding bezels and stands. Changing the tool above does not change this table.</caption>
-			<thead><tr><th scope="col">Screen</th><th scope="col">{sizeA}-inch TV</th><th scope="col">{sizeB}-inch TV</th></tr></thead>
-			<tbody>
-				<tr><th scope="row">Screen width</th><td>{length(a.width)}</td><td>{length(b.width)}</td></tr>
-				<tr><th scope="row">Screen height</th><td>{length(a.height)}</td><td>{length(b.height)}</td></tr>
-				<tr><th scope="row">Screen area</th><td>{area(a.area)}</td><td>{area(b.area)}</td></tr>
-			</tbody>
-		</table>
-		<p>Going from {sizeA} to {sizeB} inches adds {length(b.width - a.width)} in width, {length(b.height - a.height)} in height, and {area(b.area - a.area)} of picture. The diagonal increases by {sizeB - sizeA} inches ({format(linearIncrease)}%). Percentages use the smaller screen as the baseline and are calculated before rounding.</p>
-		{sections.map((section) => <><h3>{section.heading}</h3>{section.paragraphs.map((paragraph) => <p>{paragraph}</p>)}</>)}
-		<h3>Check the viewing distance for these sizes</h3>
-		<p>At RealTVSize’s balanced 30° reference angle, the calculated distances are {format(viewingDistance(sizeA, 'balanced'))} ft ({format(viewingDistance(sizeA, 'balanced') * .3048, 2)} m) for {sizeA} inches and {format(viewingDistance(sizeB, 'balanced'))} ft ({format(viewingDistance(sizeB, 'balanced') * .3048, 2)} m) for {sizeB} inches. These are geometry-based starting points. Use the <a href={`/en/viewing-distance?screen=${sizeB}`}>viewing-distance calculator</a> to try your own seat position and preferred angle.</p>
-		<p>Return to the <a href="/en/compare">main TV size comparison calculator</a> to compare any two sizes. Before ordering, <a href={`/en/will-it-fit?fit-size=${sizeB}`}>check the larger TV’s fit</a> using exact model dimensions. See the <a href="/en/methodology">methodology</a> for formulas and assumptions.</p>
-	</ContentGuide>
-	<RelatedTools current={slug} />
+<Layout lang={lang} t={t} page={page} title={content.title} description={content.description} structuredData={structuredData}>
+ <SeoBreadcrumbs lang={lang} label={copy.labels.breadcrumb} crumbs={crumbs} />
+ <TVComparison t={t} heading={content.heading} intro={content.intro} initialA={comparison.a} initialB={comparison.b} />
+ <SeoReference lang={lang} t={t} copy={copy} sizes={[comparison.a, comparison.b]} content={content} />
+ <FaqSection heading={copy.labels.faq} eyebrow={copy.labels.answers} intro="" entries={content.faqs} />
+ <CatalogDiscovery lang={lang} current={page} pairSizes={[comparison.a, comparison.b]} />
+ <RelatedTools lang={lang} current={page} />
 </Layout>

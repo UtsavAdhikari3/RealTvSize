@@ -1,0 +1,27 @@
+{
+  "canonical_urls": 191,
+  "size_pages": 80,
+  "comparison_pages": 60,
+  "size_hubs": 5,
+  "reachable_from_home": {
+    "en": 39,
+    "es": 38,
+    "de": 38,
+    "fr": 38,
+    "ja": 38
+  },
+  "checks": [
+    "static content",
+    "unique titles and descriptions",
+    "one H1",
+    "self-canonicals",
+    "reciprocal alternates",
+    "English x-default",
+    "social metadata",
+    "visible FAQ parity",
+    "detail and collection schema",
+    "internal links",
+    "robots and sitemap"
+  ],
+  "status": "passed"
+}

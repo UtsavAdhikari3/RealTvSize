@@ -1,5 +1,6 @@
 ---
 import LanguageSelector from './LanguageSelector.astro';
+import { getSeoCopy } from '../data/seo';
 import type { Language } from '../i18n/config';
 import { localizedPath, type PageId } from '../i18n/routes';
 import type { Translation } from '../i18n/types';
@@ -11,6 +12,7 @@ interface Props {
 }
 
 const { lang, page, t } = Astro.props;
+const seo = await getSeoCopy(lang);
 const primaryLinks = [
 	{ page: 'willItFit' as const, label: t.navigation.willItFit },
 	{ page: 'compare' as const, label: t.navigation.compare },
@@ -18,6 +20,7 @@ const primaryLinks = [
 	{ page: 'findMyTvSize' as const, label: t.navigation.findMyTvSize },
 ];
 const secondaryLinks = [
+	{ page: 'tvSizes' as const, label: seo.labels.sizes },
 	{ page: 'about' as const, label: t.navigation.about },
 	{ page: 'contact' as const, label: t.navigation.contact },
 	{ page: 'privacyPolicy' as const, label: t.navigation.privacyPolicy },

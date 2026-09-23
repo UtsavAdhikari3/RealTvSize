@@ -1,6 +1,7 @@
 ---
 import TVComparison from '../../components/TVComparison.astro';
 import ToolGuide from '../../components/ToolGuide.astro';
+import CatalogDiscovery from '../../components/CatalogDiscovery.astro';
 import RelatedTools from '../../components/RelatedTools.astro';
 import { toolSeo, calculatorSchema } from '../../data/tool-seo';
 import { getLanguageStaticPaths, type Language } from '../../i18n/config';
@@ -19,5 +20,7 @@ const { lang, t } = Astro.props;
 
 <Layout title={t.pageTitles.compare} lang={lang} page="compare" t={t} description={lang === 'en' ? toolSeo.compare.description : undefined} structuredData={lang === 'en' ? calculatorSchema(toolSeo.compare.heading, toolSeo.compare.description, '/en/compare') : undefined}>
 	<TVComparison t={t} heading={lang === 'en' ? toolSeo.compare.heading : undefined} />
-	{lang === 'en' && <><ToolGuide tool="compare" /><RelatedTools current="compare" /></>}
+	{lang === 'en' && <ToolGuide tool="compare" />}
+	<CatalogDiscovery lang={lang} current="compare" />
+	<RelatedTools lang={lang} current="compare" />
 </Layout>

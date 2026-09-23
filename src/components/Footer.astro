@@ -1,4 +1,5 @@
 ---
+import { getSeoCopy } from '../data/seo';
 import type { Language } from '../i18n/config';
 import { localizedPath } from '../i18n/routes';
 import type { Translation } from '../i18n/types';
@@ -9,6 +10,7 @@ interface Props {
 }
 
 const { lang, t } = Astro.props;
+const seo = await getSeoCopy(lang);
 ---
 
 <footer class="site-shell py-10 sm:py-14">
@@ -23,6 +25,7 @@ const { lang, t } = Astro.props;
 			<p class="mt-3 text-sm text-[var(--text-tertiary)]">{t.footer.tagline}</p>
 		</div>
 		<nav aria-label={t.navigation.footerLabel} class="flex flex-wrap gap-x-5 gap-y-3 text-sm text-[var(--text-secondary)]">
+			<a class="hover:text-[var(--text)]" href={localizedPath(lang, 'tvSizes')}>{seo.labels.sizes}</a>
 			<a class="hover:text-[var(--text)]" href={localizedPath(lang, 'willItFit')}>{t.navigation.willItFit}</a>
 			<a class="hover:text-[var(--text)]" href={localizedPath(lang, 'compare')}>{t.navigation.compare}</a>
 			<a class="hover:text-[var(--text)]" href={localizedPath(lang, 'viewingDistance')}>{t.navigation.viewingDistance}</a>

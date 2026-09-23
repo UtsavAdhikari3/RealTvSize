@@ -1,0 +1,48 @@
+---
+import ContentGuide from './ContentGuide.astro';
+import type { Language } from '../i18n/config';
+import type { Translation } from '../i18n/types';
+import type { SeoCopy } from '../data/seo/types';
+import { measurements, modes, angles } from '../data/seo';
+import { dimensions, viewingDistance } from '../scripts/tv-math';
+import { localizedPath } from '../i18n/routes';
+interface Props { lang: Language; t: Translation; copy: SeoCopy; sizes: number[]; content: { caption: string; geometry: string; guidance: string; distance: string } }
+const { lang, t, copy, sizes, content } = Astro.props;
+const m = measurements(lang);
+const rows = [
+ { label: copy.labels.diagonal, values: sizes, display: m.length },
+ { label: copy.labels.width, values: sizes.map(size => dimensions(size).width), display: m.length },
+ { label: copy.labels.height, values: sizes.map(size => dimensions(size).height), display: m.length },
+ { label: copy.labels.area, values: sizes.map(size => dimensions(size).area), display: m.area },
+];
+---
+<ContentGuide heading={copy.labels.dimensions} id="screen-reference">
+ <div data-editorial-reference>
+  <p>{content.geometry}</p>
+  <div class="reference-scroll" role="group" aria-label={copy.labels.dimensions} tabindex="0">
+   <table>
+    <caption>{content.caption}</caption>
+    <thead><tr><th scope="col">{copy.labels.measurement}</th>{sizes.map(size => <th scope="col">{size} in</th>)}{sizes.length === 2 && <th scope="col">{copy.labels.difference}</th>}</tr></thead>
+    <tbody>{rows.map(row => <tr><th scope="row">{row.label}</th>{row.values.map(value => <td>{row.display(value)}</td>)}{sizes.length === 2 && <td>{row.display(row.values[1] - row.values[0])}</td>}</tr>)}</tbody>
+   </table>
+  </div>
+  <p>{copy.caveat}</p>
+  <h3>{copy.labels.placement}</h3>
+  <p>{content.guidance}</p>
+  <ul>{sizes.map(size => <li><a data-reference-fit href={localizedPath(lang, 'willItFit') + '?fit-size=' + size}>{copy.labels.fit} · {size} in</a></li>)}</ul>
+  <h3>{copy.labels.viewing}</h3>
+  <p>{content.distance}</p>
+  <div class="reference-scroll" role="group" aria-label={copy.labels.viewing} tabindex="0">
+   <table>
+    <caption>{content.caption}</caption>
+    <thead><tr><th scope="col">{copy.labels.viewing}</th>{sizes.map(size => <th scope="col">{size} in</th>)}</tr></thead>
+    <tbody>{modes.map(mode => <tr><th scope="row">{t.profiles[mode].label} · {angles[mode]}°</th>{sizes.map(size => <td>{m.distance(viewingDistance(size, mode))}</td>)}</tr>)}</tbody>
+   </table>
+  </div>
+  <p>{copy.distanceNote}</p>
+ </div>
+</ContentGuide>
+<style>
+ .reference-scroll { overflow-x: auto; margin-block: 1rem; }
+ .reference-scroll:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+</style>

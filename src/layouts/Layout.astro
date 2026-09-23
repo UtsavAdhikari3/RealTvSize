@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import { getSeoCopy } from '../data/seo';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
 import { defaultLanguage, type Language } from '../i18n/config';
@@ -32,7 +33,7 @@ const {
 				: `${t.comparison.intro} ${t.recommender.intro}`,
 	keywords,
 	image = '/og-tv-size-calculator.png',
-	imageAlt = 'RealTVSize TV size calculator showing two television screen sizes',
+	imageAlt = (await getSeoCopy(Astro.props.lang)).labels.imageAlt,
 	structuredData,
 } = Astro.props;
 
@@ -110,7 +111,7 @@ const ogLocales: Record<Language, string> = {
 			}
 		</script>
 		<title>{title}</title>
-		{structuredData && <script is:inline type="application/ld+json" set:html={JSON.stringify(structuredData)} />}
+		{structuredData && <script is:inline type="application/ld+json" set:html={JSON.stringify(structuredData).replaceAll('<', '\\u003c')} />}
 	</head>
 	<body>
 		<a class="skip-link" href="#main-content">{t.common.skipToContent}</a>

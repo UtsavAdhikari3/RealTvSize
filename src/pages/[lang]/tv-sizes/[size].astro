@@ -1,0 +1,38 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import ViewingDistanceSimulator from '../../../components/ViewingDistanceSimulator.astro';
+import SeoReference from '../../../components/SeoReference.astro';
+import SeoBreadcrumbs from '../../../components/SeoBreadcrumbs.astro';
+import FaqSection from '../../../components/FaqSection.astro';
+import CatalogDiscovery from '../../../components/CatalogDiscovery.astro';
+import RelatedTools from '../../../components/RelatedTools.astro';
+import { getLanguageStaticPaths, type Language } from '../../../i18n/config';
+import type { Translation } from '../../../i18n/types';
+import { tvSizes, sizePageId, type TvSize } from '../../../data/catalog';
+import { getSeoCopy, sizeContent, detailSchema, type Crumb } from '../../../data/seo';
+import { viewingDistance } from '../../../scripts/tv-math';
+export function getStaticPaths() {
+ return getLanguageStaticPaths().flatMap(({ params, props }) => tvSizes.map(size => ({
+  params: { ...params, size: sizePageId(size) }, props: { ...props, size },
+ })));
+}
+interface Props { lang: Language; t: Translation; size: TvSize }
+const { lang, t, size } = Astro.props;
+const copy = await getSeoCopy(lang), content = sizeContent(copy, size, lang), page = sizePageId(size);
+const crumbs: Crumb[] = [{ name: t.navigation.home, page: 'home' }, { name: copy.labels.sizes, page: 'tvSizes' }, { name: content.heading, page }];
+const structuredData = detailSchema(Astro.site!, lang, page, content, crumbs);
+---
+<Layout lang={lang} t={t} page={page} title={content.title} description={content.description} structuredData={structuredData}>
+ <SeoBreadcrumbs lang={lang} label={copy.labels.breadcrumb} crumbs={crumbs} />
+ <section class="site-shell py-12 sm:py-16">
+  <div class="mx-auto max-w-3xl">
+   <h1 class="text-balance text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">{content.heading}</h1>
+   <p class="mt-6 text-lg leading-8 text-[var(--text-secondary)]">{content.intro}</p>
+  </div>
+ </section>
+ <SeoReference lang={lang} t={t} copy={copy} sizes={[size]} content={content} />
+ <ViewingDistanceSimulator t={t} initialScreen={size} initialDistance={viewingDistance(size, 'balanced')} />
+ <FaqSection heading={copy.labels.faq} eyebrow={copy.labels.answers} intro="" entries={content.faqs} />
+ <CatalogDiscovery lang={lang} current={page} size={size} />
+ <RelatedTools lang={lang} current={page} />
+</Layout>

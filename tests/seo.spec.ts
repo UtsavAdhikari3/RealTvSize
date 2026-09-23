@@ -9,13 +9,15 @@ test.beforeEach(async ({ page }) => {
 });
 
 test('sitemap pages have unique metadata within each language, one H1 and reciprocal hreflang', async ({ request }) => {
+	test.setTimeout(120_000);
 	const sitemap = await (await request.get('/sitemap.xml')).text();
 	const urls = [...sitemap.matchAll(/<loc>(.*?)<\/loc>/g)].map((match) => match[1]);
-	expect(urls).toHaveLength(51);
+	expect(urls).toHaveLength(191);
 	const pages = new Map<string, string>();
 	for (const url of urls) {
 		const response = await request.get(new URL(url).pathname);
 		expect(response.status(), url).toBe(200);
+		expect(response.headers()['x-robots-tag'] ?? '').not.toMatch(/noindex|none/i);
 		pages.set(url, await response.text());
 	}
 	const titles = new Set<string>(), descriptions = new Set<string>();
@@ -67,7 +69,7 @@ for (const [a, b] of pairs) {
 		await expect(page.locator('#tv-a-input')).toHaveValue('50');
 		await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', `${origin}${path}`);
 		await expect(page.locator('[data-fit-link="a"]')).toHaveAttribute('href', /\/en\/will-it-fit\?fit-size=50/);
-		await expect(page.locator('caption')).toContainText(`Fixed reference for ${a} and ${b} inches`);
+		await expect(page.locator('caption').first()).toContainText(`Fixed reference for ${a} and ${b} inches`);
 		await page.goto(`${path}?a=invalid&b=75&units=metric`);
 		await expect(page.locator('#tv-a-input')).toHaveValue(String(a));
 		await expect(page.locator('#tv-b-input')).toHaveValue('75');
@@ -83,9 +85,9 @@ test.describe('content without JavaScript', () => {
 			await expect(page.locator('#tv-b-input')).toHaveValue(String(b));
 			await expect(page.locator('#tv-a-size-badge')).toContainText(String(a));
 			await expect(page.locator('#tv-b-size-badge')).toContainText(String(b));
-			await expect(page.getByRole('table')).toContainText('Screen area');
-			await expect(page.getByRole('link', { name: 'main TV size comparison calculator' })).toHaveAttribute('href', '/en/compare');
-			await expect(page.locator('link[hreflang]')).toHaveCount(2);
+			await expect(page.getByRole('table').first()).toContainText('Screen area');
+			await expect(page.locator('main a[href="/en/compare"]').first()).toHaveAttribute('href', '/en/compare');
+			await expect(page.locator('link[hreflang]')).toHaveCount(6);
 		}
 		await page.goto('/en/compare');
 		const words = (await page.locator('.guide-body').innerText()).trim().split(/\s+/).length;

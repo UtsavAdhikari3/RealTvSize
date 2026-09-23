@@ -1,0 +1,29 @@
+---
+import { comparisons, tvSizes, sizePageId, type TvSize } from '../data/catalog';
+import { getSeoCopy } from '../data/seo';
+import type { Language } from '../i18n/config';
+import { interpolate } from '../i18n/types';
+import { localizedPath, type PageId } from '../i18n/routes';
+interface Props { lang: Language; current?: PageId; size?: TvSize; pairSizes?: readonly number[] }
+const { lang, current, size, pairSizes } = Astro.props;
+const copy = await getSeoCopy(lang);
+const index = size === undefined ? -1 : tvSizes.indexOf(size);
+const sizes = size !== undefined ? tvSizes.filter((_, i) => Math.abs(i - index) === 1)
+ : pairSizes ? tvSizes.filter(value => pairSizes.includes(value)) : tvSizes;
+const pairs = comparisons.filter(pair => pair.slug !== current && (size !== undefined ? pair.a === size || pair.b === size : pairSizes ? pairSizes.includes(pair.a) || pairSizes.includes(pair.b) : true));
+---
+<section class="site-shell py-12 sm:py-16" data-catalog-discovery>
+ <div class="mx-auto max-w-5xl">
+  <h2 class="text-2xl font-semibold">{current && current !== 'home' && current !== 'compare' && current !== 'tvSizes' ? copy.labels.related : copy.labels.sizes}</h2>
+  <div class="mt-6 grid gap-8 sm:grid-cols-2">
+   <nav aria-label={copy.labels.sizes}>
+    <h3 class="text-lg font-semibold"><a class="underline underline-offset-4" href={localizedPath(lang, 'tvSizes')}>{copy.labels.sizes}</a></h3>
+    <ul class="mt-4 grid grid-cols-2 gap-3 text-sm text-[var(--text-secondary)]">{sizes.map(value => <li><a class="underline underline-offset-4" href={localizedPath(lang, sizePageId(value))}>{interpolate(copy.labels.size, { size: value })}</a></li>)}</ul>
+   </nav>
+   <nav aria-label={copy.labels.comparisons}>
+    <h3 class="text-lg font-semibold"><a class="underline underline-offset-4" href={localizedPath(lang, 'compare')}>{copy.labels.comparisons}</a></h3>
+    <ul class="mt-4 grid grid-cols-2 gap-3 text-sm text-[var(--text-secondary)]">{pairs.map(pair => <li><a class="underline underline-offset-4" href={localizedPath(lang, pair.slug)}>{interpolate(copy.labels.pair, pair)}</a></li>)}</ul>
+   </nav>
+  </div>
+ </div>
+</section>

@@ -4,21 +4,22 @@ interface Props {
 	label: string;
 	min: number;
 	max: number;
-	step?: number;
+	step?: number | 'any';
 	value: number;
+	displayValue?: string;
 	outputId: string;
 	suffix: string;
 	name?: string;
 }
 
-const { id, label, min, max, step = 1, value, outputId, suffix, name = id } = Astro.props;
+const { id, label, min, max, step = 1, value, displayValue = String(value), outputId, suffix, name = id } = Astro.props;
 ---
 
 <div class="range-control min-w-0">
 	<div class="mb-3 flex items-center justify-between gap-4">
 		<label for={id} class="text-sm font-medium text-[var(--text-secondary)]">{label}</label>
-		<div class="numeric-entry"><input data-number type="text" inputmode="decimal" value={value} aria-label={`${label} (${suffix})`} aria-describedby={`${id}-error`} autocomplete="off" /><span data-number-unit aria-hidden="true">{suffix}</span></div>
-		<output id={outputId} for={id} class="sr-only">{value}{suffix}</output>
+		<div class="numeric-entry"><input data-number type="text" inputmode="decimal" value={displayValue} aria-label={`${label} (${suffix})`} aria-describedby={`${id}-error`} autocomplete="off" /><span data-number-unit aria-hidden="true">{suffix}</span></div>
+		<output id={outputId} for={id} class="sr-only">{displayValue}{suffix}</output>
 	</div>
     <p data-error id={`${id}-error`} class="input-error" hidden></p>
     <input

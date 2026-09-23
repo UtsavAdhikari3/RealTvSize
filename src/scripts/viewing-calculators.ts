@@ -8,7 +8,7 @@ const modes: Style[] = ['immersive', 'balanced', 'relaxed'];
 const simulator = document.querySelector<HTMLElement>('[data-distance-simulator]');
 if (simulator) {
 	const root = simulator;
-	const state = parseStates(new URLSearchParams(location.search)).viewingDistance;
+	const state = parseStates(new URLSearchParams(location.search), undefined, { screen: Number(root.dataset.initialScreen) || 75, viewing: Number(root.dataset.initialDistance) || 9.4 }).viewingDistance;
 	const { t, update, refreshers } = setupCalculator(root, 'viewingDistance', state, render);
 	refreshers.push(bindRange(root, 'distance-tv-size', 'diagonal', () => state.screen, (n) => state.screen = n, update, t.tools.invalid));
 	refreshers.push(bindRange(root, 'viewer-distance', 'distance', () => state.viewing, (n) => state.viewing = n, update, t.tools.invalid));

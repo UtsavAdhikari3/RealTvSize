@@ -2,6 +2,7 @@
 import WillItFit from '../../components/WillItFit.astro';
 import FaqSection from '../../components/FaqSection.astro';
 import SeoContent from '../../components/SeoContent.astro';
+import CatalogDiscovery from '../../components/CatalogDiscovery.astro';
 import RelatedTools from '../../components/RelatedTools.astro';
 import TVComparison from '../../components/TVComparison.astro';
 import TVSizeRecommender from '../../components/TVSizeRecommender.astro';
@@ -83,5 +84,6 @@ const structuredData = isEnglish
 	<WhyVisualization t={t} />
 	{isEnglish && <SeoContent />}
 	{isEnglish && <FaqSection />}
-	{isEnglish && <RelatedTools current="home" />}
+	<CatalogDiscovery lang={lang} current="home" />
+	<RelatedTools lang={lang} current="home" />
 </Layout>

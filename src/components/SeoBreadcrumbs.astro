@@ -1,0 +1,12 @@
+---
+import type { Language } from '../i18n/config';
+import { localizedPath } from '../i18n/routes';
+import type { Crumb } from '../data/seo';
+interface Props { lang: Language; label: string; crumbs: Crumb[] }
+const { lang, label, crumbs } = Astro.props;
+---
+<nav class="site-shell py-6 text-sm text-[var(--text-secondary)]" aria-label={label}>
+ <ol class="flex flex-wrap gap-2">
+  {crumbs.map((crumb, i) => <li>{i > 0 && <span aria-hidden="true"> / </span>}<a href={localizedPath(lang, crumb.page)} aria-current={i === crumbs.length - 1 ? 'page' : undefined} class="underline underline-offset-4">{crumb.name}</a></li>)}
+ </ol>
+</nav>

@@ -11,13 +11,14 @@ interface Props {
 }
 
 const { id, tvSize, distance, t } = Astro.props;
+const display = (value: number, digits = 1) => format(value, digits, Astro.params.lang ?? 'en');
 const fov = horizontalFov(tvSize, distance);
 const apparentScale = apparentViewScale(tvSize, distance);
 const profile = t.profiles[viewProfile(fov).key];
 const povAria = interpolate(t.simulation.povAria, {
 	size: tvSize,
-	distance: format(distance),
-	fov: format(fov, 0),
+	distance: display(distance),
+	fov: display(fov, 0),
 });
 const tvAria = interpolate(t.simulation.tvAria, { label: t.simulation.viewpointTv, size: tvSize });
 ---
@@ -35,9 +36,9 @@ const tvAria = interpolate(t.simulation.tvAria, { label: t.simulation.viewpointT
 			<p class="pov-description">{t.simulation.viewDescription}</p>
 		</div>
 		<div class="pov-metrics" aria-hidden="true">
-			<span class="number" data-pov-distance>{format(distance)} {t.common.feetShort}</span>
+			<span class="number" data-pov-distance>{display(distance)} {t.common.feetShort}</span>
 			<span class="metric-separator"></span>
-			<span class="number" data-pov-fov>{interpolate(t.simulation.fieldOfView, { fov: format(fov, 0) })}</span>
+			<span class="number" data-pov-fov>{interpolate(t.simulation.fieldOfView, { fov: display(fov, 0) })}</span>
 			<span class="metric-separator"></span>
 			<span data-pov-profile>{profile.label}</span>
 		</div>

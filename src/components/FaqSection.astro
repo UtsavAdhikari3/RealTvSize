@@ -1,22 +1,26 @@
 ---
 import { homeFaqs } from '../data/home-faq';
+interface Props { heading?: string; eyebrow?: string; intro?: string; entries?: readonly { question: string; answer: string }[] }
+const { heading = 'TV Size Calculator FAQs', eyebrow = 'Helpful answers',
+ intro = 'Quick answers about TV measurements, common screen sizes, room fit, and choosing the right television for your viewing distance.',
+ entries = homeFaqs } = Astro.props;
 ---
 
 <section class="border-t border-[var(--line)] py-20 sm:py-28" aria-labelledby="tv-size-faq-heading">
 	<div class="site-shell">
 		<div class="mx-auto grid max-w-5xl gap-10 lg:grid-cols-[0.72fr_1.28fr] lg:gap-16">
 			<div>
-				<p class="eyebrow">Helpful answers</p>
+				<p class="eyebrow">{eyebrow}</p>
 				<h2 id="tv-size-faq-heading" class="mt-4 text-balance text-3xl font-semibold leading-tight tracking-[-0.045em] text-[var(--text)] sm:text-4xl">
-					TV Size Calculator FAQs
+					{heading}
 				</h2>
 				<p class="mt-5 max-w-md text-pretty leading-7 text-[var(--text-secondary)]">
-					Quick answers about TV measurements, common screen sizes, room fit, and choosing the right television for your viewing distance.
+					{intro}
 				</p>
 			</div>
 
 			<div class="divide-y divide-[var(--line)] border-y border-[var(--line)]">
-				{homeFaqs.map((item, index) => (
+				{entries.map((item, index) => (
 					<details class="group open:bg-[var(--surface)]" open={index === 0}>
 						<summary class="flex cursor-pointer list-none items-center justify-between gap-6 py-5 text-left text-base font-medium leading-6 text-[var(--text)] select-none sm:py-6 sm:text-lg [&::-webkit-details-marker]:hidden">
 							<span>{item.question}</span>

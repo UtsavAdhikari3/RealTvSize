@@ -1,0 +1,40 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CatalogDiscovery from '../../../components/CatalogDiscovery.astro';
+import RelatedTools from '../../../components/RelatedTools.astro';
+import ContentGuide from '../../../components/ContentGuide.astro';
+import { getLanguageStaticPaths, type Language } from '../../../i18n/config';
+import { interpolate, type Translation } from '../../../i18n/types';
+import { localizedPath } from '../../../i18n/routes';
+import { tvSizes, sizePageId } from '../../../data/catalog';
+import { getSeoCopy, measurements } from '../../../data/seo';
+import { dimensions } from '../../../scripts/tv-math';
+export const getStaticPaths = getLanguageStaticPaths;
+interface Props { lang: Language; t: Translation }
+const { lang, t } = Astro.props;
+const copy = await getSeoCopy(lang), m = measurements(lang);
+const url = new URL(localizedPath(lang, 'tvSizes'), Astro.site).href;
+const structuredData = { '@context': 'https://schema.org', '@graph': [
+ { '@type': 'CollectionPage', '@id': url, url, name: copy.labels.sizes, description: copy.hub.description, inLanguage: lang, mainEntity: { '@id': url + '#sizes' } },
+ { '@type': 'ItemList', '@id': url + '#sizes', numberOfItems: tvSizes.length, itemListElement: tvSizes.map((size, index) => ({
+  '@type': 'ListItem', position: index + 1, name: interpolate(copy.labels.size, { size }), url: new URL(localizedPath(lang, sizePageId(size)), Astro.site).href,
+ })) },
+] };
+---
+<Layout lang={lang} t={t} page="tvSizes" title={copy.hub.title} description={copy.hub.description} structuredData={structuredData}>
+ <section class="site-shell py-12 sm:py-16">
+  <div class="mx-auto max-w-3xl">
+   <h1 class="text-4xl font-semibold tracking-tight sm:text-5xl">{copy.labels.sizes}</h1>
+   <p class="mt-6 text-lg leading-8 text-[var(--text-secondary)]">{copy.hub.intro}</p>
+  </div>
+ </section>
+ <ContentGuide heading={copy.labels.dimensions} id="size-directory">
+  <p>{copy.caveat}</p>
+  <table>
+   <thead><tr><th scope="col">{copy.labels.diagonal}</th><th scope="col">{copy.labels.width}</th><th scope="col">{copy.labels.height}</th></tr></thead>
+   <tbody>{tvSizes.map(size => <tr><th scope="row"><a href={localizedPath(lang, sizePageId(size))}>{interpolate(copy.labels.size, { size })}</a></th><td>{m.length(dimensions(size).width)}</td><td>{m.length(dimensions(size).height)}</td></tr>)}</tbody>
+  </table>
+ </ContentGuide>
+ <CatalogDiscovery lang={lang} current="tvSizes" />
+ <RelatedTools lang={lang} current="tvSizes" />
+</Layout>
